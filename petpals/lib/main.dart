@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: '',
       home: Scaffold(
-        body: NotificationsPage(), // Add the LoginForm here
+        body: HomePage(), // Add the LoginForm here
       ),
     );
   }

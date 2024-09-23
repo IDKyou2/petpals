@@ -179,8 +179,9 @@ class _LoginPageState extends State<LoginPage> {
                       height: 50,
                       width: double.infinity,
                       child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black),
                         onPressed: () {
-                          
                           if (_formKey.currentState!.validate()) {
                             _formKey.currentState?.save();
 
@@ -198,7 +199,7 @@ class _LoginPageState extends State<LoginPage> {
                           'Login',
                           style: TextStyle(
                               fontSize: 17,
-                              color: Colors.black,
+                              color: Colors.white,
                               fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -287,7 +288,6 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(
                           width: 5.0,
                         ),
-                        
                       ],
                     )
                   ],

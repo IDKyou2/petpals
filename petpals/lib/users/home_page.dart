@@ -86,18 +86,33 @@ class _HomePageState extends State<HomePage> {
             children: [
               Container(
                 height: 40,
-                color: const Color.fromARGB(255, 145, 19, 10),
+                color: Colors.black,
                 width: double.infinity,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    const Text(
-                      'Missing',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Stack(
+                      children: [
+                        const Text(
+                          ' Missing',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Positioned(
+                          bottom:
+                              1, // Adjust this value to add space between the text and the underline
+                          left: 0,
+                          right: 0,
+                          child: Container(
+                            height:
+                                3, // Adjust this value to set the thickness of the underline
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
                     GestureDetector(
                       onTap: () {
@@ -111,22 +126,29 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-            
+
               Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: TextFormField(
-                  controller: _searchController,
-                  onChanged: (search) {},
-                  decoration: const InputDecoration(
-                    labelText: 'Search',
-                    border: OutlineInputBorder(),
-                    hintText: "Search for your pet's name, breed, and more ",
-                    floatingLabelBehavior: FloatingLabelBehavior.never,
-                    hintStyle: TextStyle(
-                      color: Colors.grey, // change the color to grey
-                      fontSize: 14,
+                padding: const EdgeInsets.only(top: 10.0, bottom: 15.0),
+                child: SizedBox(
+                  width: 400,
+                  height: 45, 
+                  child: TextFormField(
+                    controller: _searchController,
+                    onChanged: (search) {},
+                    decoration: InputDecoration(
+                      labelText: '  Search',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(
+                            50), // Add this line to set the border radius
+                      ),
+                      hintText: "Search for your pet's name, breed, and more ",
+                      floatingLabelBehavior: FloatingLabelBehavior.never,
+                      hintStyle: const TextStyle(
+                        color: Colors.grey, // change the color to grey
+                        fontSize: 14,
+                      ),
+                      suffixIcon: const Icon(Icons.search),
                     ),
-                    suffixIcon: Icon(Icons.search),
                   ),
                 ),
               ),
@@ -171,7 +193,7 @@ class _HomePageState extends State<HomePage> {
                                   Text(
                                     'Name',
                                     style: TextStyle(
-                                        fontSize: 18,
+                                        fontSize: 15,
                                         fontWeight: FontWeight.bold),
                                   ),
                                   Text(

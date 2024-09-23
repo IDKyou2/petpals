@@ -86,14 +86,14 @@ class _FoundPageState extends State<FoundPage> {
             children: [
               Container(
                 height: 40,
-                color: Colors.green,
+                color: Colors.black,
                 width: double.infinity,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     GestureDetector(
-                      onTap: () => _navigateToAnotherPage(
-                          context, const HomePage()),
+                      onTap: () =>
+                          _navigateToAnotherPage(context, const HomePage()),
                       child: const Text(
                         'Missing',
                         style: TextStyle(
@@ -105,36 +105,56 @@ class _FoundPageState extends State<FoundPage> {
                     ),
                     GestureDetector(
                       onTap: () {},
-                      child: const Text(
-                        'Found',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      child: Stack(
+                        children: [
+                          const Text(
+                            ' Found',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Positioned(
+                            bottom:
+                                1, // Adjust this value to add space between the text and the underline
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                              height:
+                                  3, // Adjust this value to set the thickness of the underline
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 10.0,
-              ),
+             
               Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: TextFormField(
-                  controller: _searchController,
-                  onChanged: (search) {},
-                  decoration: const InputDecoration(
-                    labelText: 'Search',
-                    border: OutlineInputBorder(),
-                    hintText: "Search for your pet's name, breed, and more ",
-                    floatingLabelBehavior: FloatingLabelBehavior.never,
-                    hintStyle: TextStyle(
-                      color: Colors.grey, // change the color to grey
-                      fontSize: 14,
+                padding: const EdgeInsets.only(top: 10.0, bottom: 15.0),
+                child: SizedBox(
+                  width: 400,
+                  height: 45,
+                  child: TextFormField(
+                    controller: _searchController,
+                    onChanged: (search) {},
+                    decoration: InputDecoration(
+                      labelText: '  Search',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(
+                            50), // Add this line to set the border radius
+                      ),
+                      hintText: "Search for your pet's name, breed, and more ",
+                      floatingLabelBehavior: FloatingLabelBehavior.never,
+                      hintStyle: const TextStyle(
+                        color: Colors.grey, // change the color to grey
+                        fontSize: 14,
+                      ),
+                      suffixIcon: const Icon(Icons.search),
                     ),
-                    suffixIcon: Icon(Icons.search),
                   ),
                 ),
               ),
