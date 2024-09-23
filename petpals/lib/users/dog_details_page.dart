@@ -7,7 +7,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:petpals/users/first_page.dart';
 import 'package:petpals/users/home_page.dart';
 
-
 class DogDetailsPage extends StatefulWidget {
   const DogDetailsPage({super.key});
 
@@ -51,11 +50,11 @@ class _DogDetailsPageState extends State<DogDetailsPage> {
   }
 
   void _navigateToHomePage() {
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => const HomePage()),
-  );
-}
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const HomePage()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +68,9 @@ class _DogDetailsPageState extends State<DogDetailsPage> {
               padding: const EdgeInsets.only(left: 0.0),
               child: Row(
                 children: [
+                  const SizedBox(
+                    width: 10,
+                  ),
                   ElevatedButton(
                       onPressed: () {
                         Navigator.push(
@@ -79,7 +81,7 @@ class _DogDetailsPageState extends State<DogDetailsPage> {
                       },
                       child: const Icon(Icons.arrow_back)),
                   const SizedBox(
-                    width: 80,
+                    width: 10,
                   ),
                   Text(
                     'Dog Details',
@@ -92,8 +94,12 @@ class _DogDetailsPageState extends State<DogDetailsPage> {
                 ],
               ),
             ),
+            const SizedBox(
+              height: 20.0,
+            ),
+            //-------------------------------------------------------------------------- IMAGE CONTAINER ----------------------------------------------------------------------------
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 10.0),
               child: Container(
                 height: 200,
                 width: 300,
@@ -114,8 +120,19 @@ class _DogDetailsPageState extends State<DogDetailsPage> {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                  onPressed: getImageGallery, child: const Text('Add photo')),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: SizedBox(
+                  height: 40,
+                  child: ElevatedButton(
+                    onPressed: getImageGallery,
+                    child: const Text('Upload photo'),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 20,
             ),
             Padding(
               padding: const EdgeInsets.only(
@@ -424,6 +441,14 @@ class _DogDetailsPageState extends State<DogDetailsPage> {
             ),
             const SizedBox(
               height: 20,
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                width: 100,
+                height: 100,
+                color: Colors.red,
+              ),
             ),
           ],
         ),

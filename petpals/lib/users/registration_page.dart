@@ -6,7 +6,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 
-
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
 
@@ -14,10 +13,7 @@ class RegistrationPage extends StatefulWidget {
   State<RegistrationPage> createState() => _RegistrationPageState();
 }
 
-
 class _RegistrationPageState extends State<RegistrationPage> {
-  
-  
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   final _formKey = GlobalKey<FormState>();
@@ -40,7 +36,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final emailRegExp = RegExp(
     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
   );
-
 
   registerAccount() async {}
 
@@ -76,6 +71,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Padding(
               padding:
@@ -298,7 +294,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             _formKey.currentState?.save();
-                            print('Username: $_username, Email: $_email, Password: $_password,Confirm password: $_confirmPassword',);
+                            print(
+                              'Username: $_username, Email: $_email, Password: $_password,Confirm password: $_confirmPassword',
+                            );
                             _navigateToLoginPage();
                           }
                         },
@@ -349,7 +347,4 @@ class _RegistrationPageState extends State<RegistrationPage> {
       ),
     );
   }
-  
 }
-
-

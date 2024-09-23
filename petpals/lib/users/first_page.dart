@@ -25,7 +25,7 @@ class _FirstPageState extends State<FirstPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Image.asset('images/LOGO.png',
+                  Image.asset('images/LOGO_clear.png',
                       width: 200, height: 200), // Set the image size
                   const SizedBox(height: 20),
                   Text(
