@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             fit: BoxFit.fill, // Ensures the logo fits within the title area
             height: 80, // Adjust the height to fit your logo
           ),
-          backgroundColor: Colors.white,
+
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.menu),
@@ -62,18 +62,28 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
           ],
           bottom: TabBar(
-            overlayColor: WidgetStateProperty.all(Colors.white),
-            labelStyle: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.black),
+            labelStyle: const TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.black),
             indicator: const UnderlineTabIndicator(
               borderSide: BorderSide(color: Colors.black, width: 2.0),
             ),
             controller: _tabController,
-            tabs: const <Widget>[
-              Tab(
-                text: "Missing",
+            tabs: <Widget>[
+              Container(
+                color: Colors.transparent,
+                width: double.infinity,
+                child: const Tab(
+                  text: "Missing",
+                ),
               ),
-              Tab(
-                text: "Found",
+              Container(
+                color: Colors.transparent,
+                width: double.infinity,
+                child: const Tab(
+                  text: "Found",
+                ),
               ),
             ],
           ),
