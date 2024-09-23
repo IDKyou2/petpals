@@ -68,14 +68,17 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Padding(
-              padding:
-                  const EdgeInsets.only(left: 50.0, right: 50.0, top: 150.0),
+              padding: const EdgeInsets.only(
+                left: 50.0,
+                right: 50.0,
+              ),
               child: Form(
                 key: _formKey,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Image.asset('images/LOGO_clear.png',
                         width: 200, height: 200), // Set the image size
@@ -204,11 +207,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-                    /*
-                    const SizedBox(
-                      height: 10.0,
-                    ),  
-                    */
+
                     Padding(
                       padding: const EdgeInsets.only(top: 20.0),
                       child: RichText(
