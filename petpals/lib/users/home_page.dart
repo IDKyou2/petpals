@@ -5,6 +5,7 @@ import 'package:petpals/users/found_page.dart';
 import 'package:petpals/users/login_page.dart';
 import 'package:petpals/users/message_page.dart';
 import 'package:petpals/users/notifications_page.dart';
+import 'package:petpals/users/pet_profile_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,6 +18,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final _searchController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late final TabController _tabController;
+  
   @override
   void initState() {
     super.initState();
@@ -28,7 +30,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _tabController.dispose();
     super.dispose();
   }
-
+  // --------------------------------------------------------------------- FUNCTION FOR NAVIGATING PAGES ------------------------------------------------
   void _navigateToAnotherPage(BuildContext context, Widget page,
       {VoidCallback? onReturn}) async {
     final result = await Navigator.push(
@@ -1016,12 +1018,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
           ],
         ),
+        // ----------------------------------------------------------------------------- ADD ICON BUTTON -----------------------------------------------------------------------------
         floatingActionButton: SizedBox(
           height: 65,
           width: 65,
           child: FloatingActionButton(
             onPressed: () {
               print("Add icon is pressed.");
+               _navigateToAnotherPage(context, const PetProfilePage());
             },
             foregroundColor: Colors.white,
             backgroundColor: Colors.black,

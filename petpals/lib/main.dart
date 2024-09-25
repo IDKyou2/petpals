@@ -6,6 +6,7 @@ import 'package:petpals/users/found_page.dart';
 import 'package:petpals/users/home_page.dart';
 import 'package:petpals/users/login_page.dart';
 import 'package:petpals/users/notifications_page.dart';
+import 'package:petpals/users/pet_profile_page.dart';
 import 'package:petpals/users/registration_page.dart';
 import 'package:petpals/users/tabBar.dart';
 
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: '',
       home: Scaffold(
-        body: HomePage(), // Add the LoginForm here
+        body: LoginPage(), // Add the LoginForm here
       ),
     );
   }
