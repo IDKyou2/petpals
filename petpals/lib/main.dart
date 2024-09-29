@@ -9,6 +9,7 @@ import 'package:petpals/users/notifications_page.dart';
 import 'package:petpals/users/pet_profile_page.dart';
 import 'package:petpals/users/registration_page.dart';
 import 'package:petpals/users/tabBar.dart';
+import 'package:petpals/admin/admin_homepage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: '',
       home: Scaffold(
-        body: LoginPage(), // Add the LoginForm here
+        body: AdminHomepage(), // Add the LoginForm here
       ),
     );
   }
