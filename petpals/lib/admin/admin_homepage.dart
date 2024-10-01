@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:petpals/users/home_page.dart';
+import 'package:petpals/users/login_page.dart';
 
 class AdminHomepage extends StatefulWidget {
   const AdminHomepage({super.key});
@@ -10,7 +10,22 @@ class AdminHomepage extends StatefulWidget {
 
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+
 class _AdminHomepageState extends State<AdminHomepage> {
+  // --------------------------------------------------------------------- FUNCTION FOR NAVIGATING PAGES ------------------------------------------------
+  void _navigateToAnotherPage(BuildContext context, Widget page,
+      {VoidCallback? onReturn}) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => page),
+    );
+    if (onReturn != null) {
+      onReturn(); // Call the onReturn callback if it's not null
+    }
+  }
+  // ------------------------------------------------------------------------ END 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,7 +67,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                 style: TextStyle(color: Colors.red),
               ),
               onTap: () {
-                // Handle tap on item 2
+                      _navigateToAnotherPage(context, const LoginPage()); 
               },
             ),
           ],

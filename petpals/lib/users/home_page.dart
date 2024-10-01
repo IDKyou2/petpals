@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:petpals/users/first_page.dart';
-import 'package:petpals/users/found_page.dart';
 import 'package:petpals/users/login_page.dart';
 import 'package:petpals/users/message_page.dart';
 import 'package:petpals/users/notifications_page.dart';
@@ -18,7 +17,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final _searchController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late final TabController _tabController;
-  
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +29,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _tabController.dispose();
     super.dispose();
   }
+
   // --------------------------------------------------------------------- FUNCTION FOR NAVIGATING PAGES ------------------------------------------------
   void _navigateToAnotherPage(BuildContext context, Widget page,
       {VoidCallback? onReturn}) async {
@@ -114,7 +114,33 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   style: TextStyle(color: Colors.red),
                 ),
                 onTap: () {
-                  _navigateToAnotherPage(context, const LoginPage());
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Confirm Logout'),
+                      content: const Text(
+                        'Are you sure you want to log out?',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            _navigateToAnotherPage(context, const LoginPage());
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text(
+                            'Logout',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
                 },
               ),
             ],
@@ -1025,7 +1051,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           child: FloatingActionButton(
             onPressed: () {
               print("Add icon is pressed.");
-               _navigateToAnotherPage(context, const PetProfilePage());
+              _navigateToAnotherPage(context, const PetProfilePage());
             },
             foregroundColor: Colors.white,
             backgroundColor: Colors.black,

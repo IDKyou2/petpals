@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
+import 'package:petpals/users/home_page.dart';
 import 'package:petpals/users/login_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
@@ -14,6 +17,7 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
+  //initiate firestore firebase
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   final _formKey = GlobalKey<FormState>();
@@ -22,6 +26,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -37,25 +49,40 @@ class _RegistrationPageState extends State<RegistrationPage> {
     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
   );
 
-  registerAccount() async {}
+  String hashPassword(String password) {
+    final random = Random.secure();
+    final salt = List<int>.generate(16, (_) => random.nextInt(256));
+    final saltBase64 = base64Encode(salt);
+    final key =
+        sha256.convert(Uint8List.fromList(utf8.encode(password + saltBase64)));
+    return '${base64Encode(key.bytes)}:$saltBase64';
+  }
 
-  Future<void> _registerUser() async {
-    final user = {
-      'username': _usernameController.text,
-      'email': _emailController.text,
-      'password': _passwordController.text,
-      'confirmPassword': _confirmPasswordController.text,
-    };
+//For hashing
+  Future<void> _registerUser(String _username, String _email, String _password,
+      String _confirmPassword) async {
+    try {
+      final hashedPassword = hashPassword(_password);
 
-    await _firestore.collection('users').add(user);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Account created successfully.'),
-      ),
-    );
-
-    _navigateToLoginPage();
+      await _firestore.collection('users').add({
+        'username': _usernameController.text,
+        'email': _emailController.text,
+        'password': hashedPassword, // Store the hashed password
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Account created successfully.'),
+        ),
+      );
+      _navigateToLoginPage();
+    } catch (e) {
+      print('Error creating user: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error creating user. Please try again.'),
+        ),
+      );
+    }
   }
 
   void _navigateToLoginPage() {
@@ -155,7 +182,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         floatingLabelBehavior: FloatingLabelBehavior.never,
                         hintStyle: const TextStyle(
                           color: Colors.grey, // change the color to grey
-                          fontSize: 14,
+                          fontSize: 16,
                         ),
                         prefixIcon: const Icon(Icons.email),
                         suffixIcon: _showSuffixIconEmail
@@ -199,7 +226,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         floatingLabelBehavior: FloatingLabelBehavior.never,
                         hintStyle: const TextStyle(
                           color: Colors.grey,
-                          fontSize: 14,
+                          fontSize: 16,
                         ),
                         prefixIcon: const Icon(Icons.lock),
                         suffixIcon: _showSuffixIconPassword
@@ -247,7 +274,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         floatingLabelBehavior: FloatingLabelBehavior.never,
                         hintStyle: const TextStyle(
                           color: Colors.grey,
-                          fontSize: 14,
+                          fontSize: 16,
                         ),
                         prefixIcon: const Icon(Icons.lock),
                         suffixIcon: _showSuffixIconConfirmPassword
@@ -291,13 +318,23 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       height: 50,
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             _formKey.currentState?.save();
                             print(
-                              'Username: $_username, Email: $_email, Password: $_password,Confirm password: $_confirmPassword',
+                              'Username: $_username, Email: $_email, Password: $_password, Confirm password: $_confirmPassword',
                             );
-                            _navigateToLoginPage();
+                            try {
+                              await _registerUser(_username!, _email!,
+                                  _password!, _confirmPassword!);
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => LoginPage()),
+                              );
+                            } catch (e) {
+                              print('Error registering user: $e');
+                            }
                           }
                         },
                         child: const Text(

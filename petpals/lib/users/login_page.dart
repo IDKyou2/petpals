@@ -1,11 +1,13 @@
 import 'dart:async';
-
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:petpals/components/square_tile.dart';
 import 'package:petpals/users/first_page.dart';
+import 'package:petpals/users/home_page.dart';
 import 'package:petpals/users/registration_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -16,6 +18,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  //initiate firestore firebase
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -26,24 +30,6 @@ class _LoginPageState extends State<LoginPage> {
   bool _showSuffixIcon = false;
   bool _showSuffixIconPassword = false;
 
-  String? _errorMessage;
-
-  // Function to clear the validation error message after 3 seconds
-  void _startErrorClearTimer() {
-    Timer(const Duration(seconds: 3), () {
-      setState(() {
-        _errorMessage = null;
-      });
-    });
-  }
-
-  void _navigateToFirstPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const FirstPage()),
-    );
-  }
-
   void _navigateToAnotherPage(BuildContext context, Widget page) {
     Navigator.push(
       context,
@@ -51,16 +37,57 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  loginUser() {}
+  Future<void> _loginUser(
+      String username, String password, BuildContext context) async {
+    try {
+      final user = await _firestore
+          .collection('users')
+          .where('username', isEqualTo: _username)
+          .get();
+      if (user.docs.isEmpty) {
+        _showErrorDialog(context, 'Ooops! invalid credentials. Try again.');
+        return;
+      }
+      final userData = user.docs.first.data();
+      if (userData == null) {
+        _showErrorDialog(context, 'User data is null');
+        return;
+      }
+      final hashedPassword = userData['password'];
+      final parts = hashedPassword.split(':');
+      final saltBase64 = parts[1];
+      final salt = base64Decode(saltBase64);
+      final key = sha256
+          .convert(Uint8List.fromList(utf8.encode(_password! + saltBase64)));
+      if (base64Encode(key.bytes) != parts[0]) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Incorrect password'),
+          ),
+        );
+        return;
+      }
+      print('Login successful');
+      _navigateToAnotherPage(context, const HomePage());
+    } catch (e) {
+      _showErrorDialog(context, 'Error logging in: $e');
+    }
+  }
 
-  Future addUserDetails(String username, String email, String password,
-      String confirmPassword) async {
-    await FirebaseFirestore.instance.collection('users').add({
-      'username': username,
-      'email': email,
-      'password': password,
-      'confirmPassword': confirmPassword,
-    });
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -184,7 +211,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black),
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             _formKey.currentState?.save();
 
@@ -194,8 +221,11 @@ class _LoginPageState extends State<LoginPage> {
                             }
                             _usernameController.clear();
                             _passwordController.clear();
-
-                            _navigateToFirstPage();
+                          }
+                          try {
+                            await _loginUser(_username!, _password!, context);
+                          } catch (e) {
+                            print('Error logging in: $e');
                           }
                         },
                         child: const Text(
@@ -207,7 +237,6 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-
                     Padding(
                       padding: const EdgeInsets.only(top: 20.0),
                       child: RichText(
@@ -227,16 +256,12 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
-                                  /*
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
                                             const RegistrationPage()),
                                   );
-                                  */
-                                  _navigateToAnotherPage(
-                                      context, const RegistrationPage());
                                 },
                             ),
                           ],

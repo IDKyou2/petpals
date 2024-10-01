@@ -4,7 +4,6 @@ import 'package:petpals/users/first_page.dart';
 import 'package:petpals/users/home_page.dart';
 import 'package:petpals/users/login_page.dart';
 import 'package:petpals/users/message_page.dart';
-import 'package:petpals/users/notifications_page.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
