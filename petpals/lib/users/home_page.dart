@@ -96,10 +96,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ListTile(
                 title: const Text('Home'),
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const FirstPage()),
-                  );
+                  _navigateToAnotherPage(context, const HomePage());
                 },
               ),
               ListTile(
@@ -131,7 +128,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         TextButton(
                           onPressed: () {
                             _navigateToAnotherPage(context, const LoginPage());
-                            Navigator.of(context).pop();
                           },
                           child: const Text(
                             'Logout',
