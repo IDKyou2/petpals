@@ -14,7 +14,6 @@ class MessagePage extends StatefulWidget {
 
 class _MessagePageState extends State<MessagePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final bool _pageLoaded = false;
 
   void _navigateToAnotherPage(BuildContext context, Widget page) {
     Navigator.push(
@@ -100,7 +99,7 @@ class _MessagePageState extends State<MessagePage> {
                     width: double.infinity,
                     height: 100.0,
                     decoration: BoxDecoration(
-                      color: Colors.grey, // set the background color
+                      color: Colors.transparent, // set the background color
                       borderRadius: BorderRadius.circular(
                           0), // add a border radius (optional)
                     ),
@@ -151,7 +150,7 @@ class _MessagePageState extends State<MessagePage> {
                     width: double.infinity,
                     height: 100.0,
                     decoration: BoxDecoration(
-                      color: Colors.grey, // set the background color
+                      color: Colors.transparent, // set the background color
                       borderRadius: BorderRadius.circular(
                           0), // add a border radius (optional)
                     ),
@@ -202,7 +201,7 @@ class _MessagePageState extends State<MessagePage> {
                     width: double.infinity,
                     height: 100.0,
                     decoration: BoxDecoration(
-                      color: Colors.grey, // set the background color
+                      color: Colors.transparent, // set the background color
                       borderRadius: BorderRadius.circular(
                           0), // add a border radius (optional)
                     ),
@@ -253,7 +252,7 @@ class _MessagePageState extends State<MessagePage> {
                     width: double.infinity,
                     height: 100.0,
                     decoration: BoxDecoration(
-                      color: Colors.grey, // set the background color
+                      color: Colors.transparent, // set the background color
                       borderRadius: BorderRadius.circular(
                           0), // add a border radius (optional)
                     ),

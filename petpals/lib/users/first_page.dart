@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:petpals/users/dog_details_page.dart';
@@ -11,7 +12,6 @@ class FirstPage extends StatefulWidget {
 }
 
 class _FirstPageState extends State<FirstPage> {
-  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +51,9 @@ class _FirstPageState extends State<FirstPage> {
                           MaterialPageRoute(
                               builder: (context) => const DogDetailsPage()),
                         );
-                        print('I lost a dog button is pressed.');
+                        if (kDebugMode) {
+                          print('I lost a dog button is pressed.');
+                        }
                       },
                       child: Text(
                         'I lost a dog',
@@ -76,7 +78,9 @@ class _FirstPageState extends State<FirstPage> {
                           MaterialPageRoute(
                               builder: (context) => const FoundPage()),
                         );
-                        print('I found a dog button is pressed.');
+                        if (kDebugMode) {
+                          print('I found a dog button is pressed.');
+                        }
                       },
                       child: Text(
                         'I found a dog',

@@ -1,6 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:petpals/users/first_page.dart';
 import 'package:petpals/users/login_page.dart';
 import 'package:petpals/users/message_page.dart';
 import 'package:petpals/users/notifications_page.dart';
@@ -33,10 +33,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   // --------------------------------------------------------------------- FUNCTION FOR NAVIGATING PAGES ------------------------------------------------
   void _navigateToAnotherPage(BuildContext context, Widget page,
       {VoidCallback? onReturn}) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => page),
-    );
     if (onReturn != null) {
       onReturn(); // Call the onReturn callback if it's not null
     }
@@ -121,7 +117,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       actions: [
                         TextButton(
                           onPressed: () {
-                            Navigator.of(context).pop();
+                            Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const LoginPage()),
+                                  );
                           },
                           child: const Text('Cancel'),
                         ),
@@ -1046,7 +1047,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           width: 65,
           child: FloatingActionButton(
             onPressed: () {
-              print("Add icon is pressed.");
+              if (kDebugMode) {
+                print("Add icon is pressed.");
+              }
               _navigateToAnotherPage(context, const PetProfilePage());
             },
             foregroundColor: Colors.white,

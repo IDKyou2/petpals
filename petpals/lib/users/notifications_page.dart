@@ -14,7 +14,6 @@ class NotificationsPage extends StatefulWidget {
 
 class _NotificationsPageState extends State<NotificationsPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final bool _pageLoaded = false;
 
   void _navigateToAnotherPage(BuildContext context, Widget page) {
     Navigator.push(

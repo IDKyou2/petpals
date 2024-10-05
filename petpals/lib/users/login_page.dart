@@ -1,12 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:petpals/components/square_tile.dart';
-import 'package:petpals/users/first_page.dart';
 import 'package:petpals/users/home_page.dart';
 import 'package:petpals/users/registration_page.dart';
 
@@ -38,52 +35,66 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _loginUser(
-      String username, String password, BuildContext context) async {
-    try {
-      final user = await _firestore
-          .collection('users')
-          .where('username', isEqualTo: _username)
-          .get();
-      if (user.docs.isEmpty) {
-        _showErrorDialog(context, 'Ooops! invalid credentials. Try again.');
-        return;
+    String username, String password, BuildContext context) async {
+  try {
+    // Fetch user data based on username
+    final user = await _firestore
+        .collection('users')
+        .where('username', isEqualTo: username)
+        .get();
+
+    // Check if user exists
+    if (user.docs.isEmpty) {
+      if (context.mounted) {
+        _showErrorDialog(context, 'Ooops! Invalid credentials. Try again.');
       }
-      final userData = user.docs.first.data();
-      if (userData == null) {
-        _showErrorDialog(context, 'User data is null');
-        return;
-      }
-      final hashedPassword = userData['password'];
-      final parts = hashedPassword.split(':');
-      final saltBase64 = parts[1];
-      final salt = base64Decode(saltBase64);
-      final key = sha256
-          .convert(Uint8List.fromList(utf8.encode(_password! + saltBase64)));
-      if (base64Encode(key.bytes) != parts[0]) {
+      return;
+    }
+
+    // Retrieve user data
+    final userData = user.docs.first.data();
+    final storedPassword = userData['password'];
+
+    // Compare the provided password with the stored password
+    if (password != storedPassword) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Incorrect password'),
           ),
         );
-        return;
       }
+      return;
+    }
+
+    if (kDebugMode) {
       print('Login successful');
+    }
+
+    // Navigate to HomePage if login is successful
+    if (context.mounted) {
       _navigateToAnotherPage(context, const HomePage());
-    } catch (e) {
+    }
+  } catch (e) {
+    // Show error dialog on exception
+    if (context.mounted) {
       _showErrorDialog(context, 'Error logging in: $e');
     }
   }
+}
+
+
 
   void _showErrorDialog(BuildContext context, String message) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Error'),
+        title: const Text('Error'),
         content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -126,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                         floatingLabelBehavior: FloatingLabelBehavior.never,
                         hintStyle: const TextStyle(
                           color: Colors.grey, // hint text color
-                          fontSize: 14,
+                          fontSize: 15,
                         ),
                         prefixIcon: const Icon(Icons.person),
                         suffixIcon: _showSuffixIcon
@@ -167,7 +178,7 @@ class _LoginPageState extends State<LoginPage> {
                         floatingLabelBehavior: FloatingLabelBehavior.never,
                         hintStyle: const TextStyle(
                           color: Colors.grey,
-                          fontSize: 14,
+                          fontSize: 15,
                         ),
                         prefixIcon: const Icon(Icons.lock),
                         suffixIcon: _showSuffixIconPassword
@@ -225,7 +236,9 @@ class _LoginPageState extends State<LoginPage> {
                           try {
                             await _loginUser(_username!, _password!, context);
                           } catch (e) {
-                            print('Error logging in: $e');
+                            if (kDebugMode) {
+                              print('Error logging in: $e');
+                            }
                           }
                         },
                         child: const Text(
@@ -304,9 +317,11 @@ class _LoginPageState extends State<LoginPage> {
                           child:
                               const SquareTile(imagePath: 'images/google.png'),
                           onTap: () {
-                            print(
-                              "Google logo tapped.",
-                            );
+                            if (kDebugMode) {
+                              print(
+                                "Google logo tapped.",
+                              );
+                            }
                           },
                         ),
                         const SizedBox(

@@ -20,7 +20,6 @@ enum Gender {
 }
 
 class _DogDetailsPageState extends State<DogDetailsPage> {
-  final _formKey = GlobalKey<FormState>();
   final _dogNameController = TextEditingController();
   final _dogAgeController = TextEditingController();
   final _dogBreedController = TextEditingController();
@@ -28,7 +27,6 @@ class _DogDetailsPageState extends State<DogDetailsPage> {
   final _dogSizeController = TextEditingController();
   final _dogUniqueMarkingsController = TextEditingController();
 
-  String? _dogName, _dogAge, _dogBreed, _dogColor, _dogSize, _dogUniqueMarkings;
   Gender? _gender;
 
   File? _image;

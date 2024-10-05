@@ -1,10 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
-import 'package:petpals/users/home_page.dart';
 import 'package:petpals/users/login_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -27,12 +23,60 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
+  @override
   void dispose() {
     _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  void _registerAndNavigate(BuildContext context) async {
+    // Ensure that the fields are filled
+    if (_usernameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _confirmPasswordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill in all fields.'),
+        ),
+      );
+      return;
+    }
+
+    try {
+      // Pass the values from the controllers
+      await _registerUser(
+        context,
+        _usernameController.text, // Use controller's text
+        _emailController.text,
+        _passwordController.text,
+        _confirmPasswordController.text,
+      );
+
+      // Check if the context is still valid
+      if (!context.mounted) return;
+
+      // Navigate to LoginPage if the widget is still mounted
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginPage(),
+        ),
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error registering user: $e');
+      }
+      // Display error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error registering user. Please try again.'),
+        ),
+      );
+    }
   }
 
   bool _obscurePassword = true;
@@ -49,34 +93,37 @@ class _RegistrationPageState extends State<RegistrationPage> {
     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
   );
 
-  String hashPassword(String password) {
-    final random = Random.secure();
-    final salt = List<int>.generate(16, (_) => random.nextInt(256));
-    final saltBase64 = base64Encode(salt);
-    final key =
-        sha256.convert(Uint8List.fromList(utf8.encode(password + saltBase64)));
-    return '${base64Encode(key.bytes)}:$saltBase64';
-  }
-
 //For hashing
-  Future<void> _registerUser(String _username, String _email, String _password,
-      String _confirmPassword) async {
+  Future<void> _registerUser(BuildContext context, String username,
+      String email, String password, String confirmPassword) async {
     try {
-      final hashedPassword = hashPassword(_password);
-
       await _firestore.collection('users').add({
-        'username': _usernameController.text,
-        'email': _emailController.text,
-        'password': hashedPassword, // Store the hashed password
+        'username': username, // Use the parameter instead of the controller
+        'email': email,
+        'password': password, // Store the hashed password
       });
+
+      // Check if the context is still valid
+      if (!context.mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Account created successfully.'),
         ),
       );
+
+      // Navigate to the login page only if the widget is still mounted
+      if (!context.mounted) return;
+
       _navigateToLoginPage();
     } catch (e) {
-      print('Error creating user: $e');
+      if (kDebugMode) {
+        print('Error creating user: $e');
+      }
+
+      // Check if the context is still valid
+      if (!context.mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Error creating user. Please try again.'),
@@ -127,12 +174,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       },
                       decoration: InputDecoration(
                         labelText: 'Username',
-                        border: const OutlineInputBorder(),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                        ),
                         hintText: 'Enter your username',
                         floatingLabelBehavior: FloatingLabelBehavior.never,
                         hintStyle: const TextStyle(
                           color: Colors.grey, // change the color to grey
-                          fontSize: 16,
+                          fontSize: 15,
                         ),
                         prefixIcon: const Icon(Icons.person),
                         suffixIcon: _showSuffixIconUsername
@@ -177,12 +226,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       },
                       decoration: InputDecoration(
                         labelText: 'Email',
-                        border: const OutlineInputBorder(),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                        ),
                         hintText: 'Enter your email',
                         floatingLabelBehavior: FloatingLabelBehavior.never,
                         hintStyle: const TextStyle(
                           color: Colors.grey, // change the color to grey
-                          fontSize: 16,
+                          fontSize: 15,
                         ),
                         prefixIcon: const Icon(Icons.email),
                         suffixIcon: _showSuffixIconEmail
@@ -220,13 +271,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     TextFormField(
                       obscureText: _obscurePassword,
                       decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                        ),
                         labelText: 'Password',
                         hintText: 'Enter password',
                         floatingLabelBehavior: FloatingLabelBehavior.never,
                         hintStyle: const TextStyle(
                           color: Colors.grey,
-                          fontSize: 16,
+                          fontSize: 15,
                         ),
                         prefixIcon: const Icon(Icons.lock),
                         suffixIcon: _showSuffixIconPassword
@@ -268,13 +321,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     TextFormField(
                       obscureText: _obscureConfirmPassword,
                       decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                        ),
                         labelText: 'Confirm password',
                         hintText: 'Confirm your password',
                         floatingLabelBehavior: FloatingLabelBehavior.never,
                         hintStyle: const TextStyle(
                           color: Colors.grey,
-                          fontSize: 16,
+                          fontSize: 15,
                         ),
                         prefixIcon: const Icon(Icons.lock),
                         suffixIcon: _showSuffixIconConfirmPassword
@@ -318,30 +373,25 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       height: 50,
                       width: double.infinity,
                       child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black),
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             _formKey.currentState?.save();
-                            print(
-                              'Username: $_username, Email: $_email, Password: $_password, Confirm password: $_confirmPassword',
-                            );
-                            try {
-                              await _registerUser(_username!, _email!,
-                                  _password!, _confirmPassword!);
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => LoginPage()),
+                            if (kDebugMode) {
+                              print(
+                                'Username: $_username, Email: $_email, Password: $_password, Confirm password: $_confirmPassword',
                               );
-                            } catch (e) {
-                              print('Error registering user: $e');
                             }
+                            // Call this method in your widget's context
+                            _registerAndNavigate(context);
                           }
                         },
                         child: const Text(
                           'Register',
                           style: TextStyle(
                               fontSize: 18.0,
-                              color: Colors.black,
+                              color: Colors.white,
                               fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -355,12 +405,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           const TextSpan(
                             text: "I already have an account. ",
                             style:
-                                TextStyle(fontSize: 16.0, color: Colors.black),
+                                TextStyle(fontSize: 15.0, color: Colors.black),
                           ),
                           TextSpan(
                             text: "Login",
                             style: const TextStyle(
-                                fontSize: 16.0,
+                                fontSize: 15.0,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.blue),
                             recognizer: TapGestureRecognizer()

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:petpals/admin/admin_manage_users_page.dart';
 import 'package:petpals/users/login_page.dart';
 
 class AdminHomepage extends StatefulWidget {
@@ -10,22 +11,7 @@ class AdminHomepage extends StatefulWidget {
 
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-
 class _AdminHomepageState extends State<AdminHomepage> {
-  // --------------------------------------------------------------------- FUNCTION FOR NAVIGATING PAGES ------------------------------------------------
-  void _navigateToAnotherPage(BuildContext context, Widget page,
-      {VoidCallback? onReturn}) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => page),
-    );
-    if (onReturn != null) {
-      onReturn(); // Call the onReturn callback if it's not null
-    }
-  }
-  // ------------------------------------------------------------------------ END 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,11 +40,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
             ListTile(
               title: const Text('Home'),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const AdminHomepage()),
-                );
+                Navigator.pop(context); // This returns to the previous screen
               },
             ),
             ListTile(
@@ -67,14 +49,17 @@ class _AdminHomepageState extends State<AdminHomepage> {
                 style: TextStyle(color: Colors.red),
               ),
               onTap: () {
-                      _navigateToAnotherPage(context, const LoginPage()); 
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
               },
             ),
           ],
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.only(left: 20.0,right: 20.0),
+        padding: const EdgeInsets.only(left: 20.0, right: 20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -91,6 +76,11 @@ class _AdminHomepageState extends State<AdminHomepage> {
               child: InkWell(
                 splashColor: Colors.black.withAlpha(30),
                 onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AdminManageUsersPage()),
+                  );
                   debugPrint('Card tapped.');
                 },
                 child: const Column(
@@ -106,7 +96,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
                             Padding(
                               padding: EdgeInsets.only(left: 10.0, right: 10.0),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   SizedBox(
                                     width: 50,
@@ -116,8 +107,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                       child: Icon(
                                         Icons.person, // Use the person icon
                                         size: 40, // Set the icon size
-                                        color:
-                                            Colors.black87, // Set the icon color
+                                        color: Colors
+                                            .black87, // Set the icon color
                                       ),
                                     ),
                                   ),
@@ -172,7 +163,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
                             Padding(
                               padding: EdgeInsets.only(left: 10.0, right: 10.0),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   SizedBox(
                                     width: 50,
@@ -180,7 +172,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                       backgroundColor: Colors
                                           .transparent, // Set the background color
                                       child: Icon(
-                                        Icons.warning_rounded, // Use the person icon
+                                        Icons
+                                            .warning_rounded, // Use the person icon
                                         size: 40, // Set the icon size
                                         color: Colors.red, // Set the icon color
                                       ),
@@ -217,7 +210,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                 ),
               ),
             ),
-        //------------------------------------------------------------------------------------------------------------------------------------------------------------
+            //------------------------------------------------------------------------------------------------------------------------------------------------------------
             Card(
               clipBehavior: Clip.hardEdge,
               child: InkWell(
@@ -237,7 +230,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
                             Padding(
                               padding: EdgeInsets.only(left: 10.0, right: 10.0),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   SizedBox(
                                     width: 50,
@@ -247,7 +241,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                       child: Icon(
                                         Icons.check, // Use the person icon
                                         size: 40, // Set the icon size
-                                        color: Colors.green, // Set the icon color
+                                        color:
+                                            Colors.green, // Set the icon color
                                       ),
                                     ),
                                   ),
@@ -302,7 +297,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
                             Padding(
                               padding: EdgeInsets.only(left: 10.0, right: 10.0),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   SizedBox(
                                     width: 50,
@@ -312,7 +308,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                       child: Icon(
                                         Icons.handshake, // Use the person icon
                                         size: 40, // Set the icon size
-                                        color: Color.fromARGB(255, 0, 94, 3), // Set the icon color
+                                        color: Color.fromARGB(255, 0, 94,
+                                            3), // Set the icon color
                                       ),
                                     ),
                                   ),
@@ -367,7 +364,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
                             Padding(
                               padding: EdgeInsets.only(left: 10.0, right: 10.0),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   SizedBox(
                                     width: 50,
@@ -375,9 +373,11 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                       backgroundColor: Colors
                                           .transparent, // Set the background color
                                       child: Icon(
-                                        Icons.warning_rounded, // Use the person icon
+                                        Icons
+                                            .warning_rounded, // Use the person icon
                                         size: 40, // Set the icon size
-                                        color: Color.fromARGB(255, 221, 202, 27), // Set the icon color
+                                        color: Color.fromARGB(255, 221, 202,
+                                            27), // Set the icon color
                                       ),
                                     ),
                                   ),

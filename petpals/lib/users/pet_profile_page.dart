@@ -15,10 +15,6 @@ class _PetProfilePageState extends State<PetProfilePage> {
   // --------------------------------------------------------------------- FUNCTION FOR NAVIGATING PAGES ------------------------------------------------
   void _navigateToAnotherPage(BuildContext context, Widget page,
       {VoidCallback? onReturn}) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => page),
-    );
     if (onReturn != null) {
       onReturn(); // Call the onReturn callback if it's not null
     }
