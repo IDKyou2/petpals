@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:petpals/users/first_page.dart';
 import 'package:petpals/users/home_page.dart';
 import 'package:petpals/users/login_page.dart';
 import 'package:petpals/users/message_page.dart';
+import 'package:petpals/users/pet_profile_page.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -47,31 +47,60 @@ class _NotificationsPageState extends State<NotificationsPage> {
         drawer: Drawer(
           child: ListView(
             children: <Widget>[
-              ListTile(
-                title: const Text('Home'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const FirstPage()),
+            ListTile(
+              title: const Text('Home'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomePage()),
+                );
+              },
+            ),
+            ListTile(
+              title: const Text('Profile'),
+              onTap: () {
+                 _navigateToAnotherPage(context, const PetProfilePage());
+              },
+            ),
+            ListTile(
+              title: const Text(
+                'Logout',
+                style: TextStyle(color: Colors.red),
+              ),
+              onTap: () {
+                showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Confirm Logout'),
+                      content: const Text(
+                        'Are you sure you want to log out?',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginPage()),
+                            );
+                          },
+                          child: const Text(
+                            'Logout',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      ],
+                    ),
                   );
-                },
-              ),
-              ListTile(
-                title: const Text('Profile'),
-                onTap: () {
-                  // Handle tap on item 2
-                },
-              ),
-              ListTile(
-                title: const Text(
-                  'Logout',
-                  style: TextStyle(color: Colors.red),
-                ),
-                onTap: () {
-                  _navigateToAnotherPage(context, const LoginPage());
-                },
-              ),
-            ],
+              },
+            ),
+          ],
           ),
         ),
         //-------------------------------------------------------------------------- BODY --------------------------------------------------------------------------

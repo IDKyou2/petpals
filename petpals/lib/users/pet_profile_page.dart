@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:petpals/users/home_page.dart';
+import 'package:petpals/users/login_page.dart';
 
 class PetProfilePage extends StatefulWidget {
   const PetProfilePage({super.key});
@@ -58,7 +59,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
             ListTile(
               title: const Text('Profile'),
               onTap: () {
-                // Handle tap on item 2
+                _navigateToAnotherPage(context, const PetProfilePage());
               },
             ),
             ListTile(
@@ -67,7 +68,36 @@ class _PetProfilePageState extends State<PetProfilePage> {
                 style: TextStyle(color: Colors.red),
               ),
               onTap: () {
-                // Handle tap on item 2
+                showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Confirm Logout'),
+                      content: const Text(
+                        'Are you sure you want to log out?',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginPage()),
+                            );
+                          },
+                          child: const Text(
+                            'Logout',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
               },
             ),
           ],

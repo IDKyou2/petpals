@@ -33,8 +33,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   // --------------------------------------------------------------------- FUNCTION FOR NAVIGATING PAGES ------------------------------------------------
   void _navigateToAnotherPage(BuildContext context, Widget page,
       {VoidCallback? onReturn}) async {
+    // Navigate to the new page
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => page),
+    );
+
+    // Call the onReturn callback if it's not null, after returning from the page
     if (onReturn != null) {
-      onReturn(); // Call the onReturn callback if it's not null
+      onReturn();
     }
   }
 
@@ -98,7 +105,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ListTile(
                 title: const Text('Profile'),
                 onTap: () {
-                  // Handle tap on item 2
+                  _navigateToAnotherPage(context, const PetProfilePage());
                 },
               ),
               ListTile(
@@ -117,18 +124,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       actions: [
                         TextButton(
                           onPressed: () {
-                            Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const LoginPage()),
-                                  );
+                            Navigator.pop(context);
                           },
                           child: const Text('Cancel'),
                         ),
                         TextButton(
                           onPressed: () {
-                            _navigateToAnotherPage(context, const LoginPage());
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginPage()),
+                            );
                           },
                           child: const Text(
                             'Logout',
