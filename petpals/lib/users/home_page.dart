@@ -189,8 +189,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           suffixIcon: const Icon(Icons.search),
                         ),
                       ),
+                       //----------------------------------------------------------- SEARCH BAR END -----------------------------------------------------------
                     ),
                   ),
+                   //----------------------------------------------------------- CARD 1 -----------------------------------------------------------
                   Card(
                     clipBehavior: Clip.hardEdge,
                     child: InkWell(
@@ -200,9 +202,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       },
                       child: Column(
                         children: [
-                          const Padding(
-                              padding: EdgeInsets.all(8.0), child: SizedBox()),
-                          // Upper portion for the picture
+                    
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Container(
@@ -211,7 +211,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               decoration: const BoxDecoration(
                                 image: DecorationImage(
                                   image: AssetImage(
-                                      'images/insert_image.png'), // Replace with your image
+                                      'images/german_shepherd.webp'), // Replace with your image
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -230,9 +230,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        'Name',
+                                        'Bravo',
                                         style: TextStyle(
-                                            fontSize: 15,
+                                            fontSize: 20,
                                             fontWeight: FontWeight.bold),
                                       ),
                                       Text(
@@ -254,12 +254,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                             fontSize: 14, color: Colors.grey),
                                       ),
                                       Text(
-                                        '(Havanese)',
+                                        'German Shepherd',
                                         style: TextStyle(
                                           color:
-                                              Colors.blue, // Set the text color
+                                              Colors.black, // Set the text color
                                           fontSize:
-                                              13, // Set the text font size
+                                              15, // Set the text font size
                                           fontWeight: FontWeight
                                               .bold, // Set the text font weight
                                         ),
@@ -276,12 +276,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                             fontSize: 14, color: Colors.grey),
                                       ),
                                       Text(
-                                        '(Male)',
+                                        'Male',
                                         style: TextStyle(
                                           color:
-                                              Colors.blue, // Set the text color
+                                              Colors.black, // Set the text color
                                           fontSize:
-                                              13, // Set the text font size
+                                              15, // Set the text font size
                                           fontWeight: FontWeight
                                               .bold, // Set the text font weight
                                         ),
@@ -298,9 +298,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                             fontSize: 14, color: Colors.grey),
                                       ),
                                       Text(
-                                        '(Location seen):',
+                                        'Cabantian',
                                         style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 15,
                                             color: Colors.red,
                                             fontWeight: FontWeight.bold),
                                       ),
@@ -313,7 +313,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         'More',
                                         style: TextStyle(
                                           fontSize:
-                                              14, // Set the text font size
+                                              15
+                                              , // Set the text font size
                                           fontWeight: FontWeight
                                               .bold, // Set the text font weight
                                         ),
@@ -328,6 +329,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
+                   //----------------------------------------------------------- CARD 1 END -----------------------------------------------------------
                   Card(
                     clipBehavior: Clip.hardEdge,
                     child: InkWell(
