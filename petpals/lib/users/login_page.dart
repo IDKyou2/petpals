@@ -35,66 +35,105 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _loginUser(
-    String username, String password, BuildContext context) async {
-  try {
-    // Fetch user data based on username
-    final user = await _firestore
-        .collection('users')
-        .where('username', isEqualTo: username)
-        .get();
+      String username, String password, BuildContext context) async {
+    try {
+      // Fetch user data based on username
+      final user = await _firestore
+          .collection('users')
+          .where('username', isEqualTo: username)
+          .where('password', isEqualTo: password)
+          .get();
 
-    // Check if user exists
-    if (user.docs.isEmpty) {
-      if (context.mounted) {
-        _showErrorDialog(context, 'Ooops! Invalid credentials. Try again.');
+      // Check if user exists
+      if (user.docs.isEmpty) {
+        if (context.mounted && password.isNotEmpty && username.isNotEmpty) {
+          _passwordController.clear();
+          _showErrorDialog(context, 'Invalid credentials. Try again.');
+        }
+        return;
       }
-      return;
-    }
 
-    // Retrieve user data
-    final userData = user.docs.first.data();
-    final storedPassword = userData['password'];
+      // Retrieve user data
+      final userData = user.docs.first.data();
+      final storedPassword = userData['password'];
 
-    // Compare the provided password with the stored password
-    if (password != storedPassword) {
+      // Compare the provided password with the stored password
+      if (password.isNotEmpty &&
+          username.isNotEmpty &&
+          password != storedPassword) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Incorrect username or password.'),
+            ),
+          );
+        }
+        _usernameController.clear();
+        _passwordController.clear();
+        return;
+      }
+
+      if (kDebugMode) {
+        print('Login successful');
+      }
+
+      // Navigate to HomePage if login is successful
       if (context.mounted) {
+        _navigateToAnotherPage(context, const HomePage());
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Incorrect password'),
-          ),
-        );
+      const SnackBar(
+        content: Text('Logged in successfully.'),
+        duration: Duration(seconds: 3),
+      ),
+    );
       }
-      return;
-    }
-
-    if (kDebugMode) {
-      print('Login successful');
-    }
-
-    // Navigate to HomePage if login is successful
-    if (context.mounted) {
-      _navigateToAnotherPage(context, const HomePage());
-    }
-  } catch (e) {
-    // Show error dialog on exception
-    if (context.mounted) {
-      _showErrorDialog(context, 'Error logging in: $e');
+    } catch (e) {
+      // Show error dialog on exception
+      if (context.mounted) {
+        _showErrorDialog(context, 'Error logging in: $e');
+      }
     }
   }
-}
-
-
 
   void _showErrorDialog(BuildContext context, String message) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Error'),
-        content: Text(message),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        title: const Text(
+          "Oops! Something went wrong",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.redAccent,
+          ),
+        ),
+        content: Text(
+          message,
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[800],
+          ),
+        ),
         actions: [
           TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
+            child: const Text(
+              'OK',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),

@@ -134,7 +134,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => const LoginPage()),
-                            );
+                            ).then((_) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content:
+                                      Text('You have logged out successfully.'),
+                                  duration: Duration(seconds: 3),
+                                ),
+                              );
+                            });
                           },
                           child: const Text(
                             'Logout',
