@@ -20,7 +20,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
       onReturn(); // Call the onReturn callback if it's not null
     }
   }
-  // ------------------------------------------------------------------------ END 
+  // ------------------------------------------------------------------------ END
 
   @override
   Widget build(BuildContext context) {
@@ -69,35 +69,35 @@ class _PetProfilePageState extends State<PetProfilePage> {
               ),
               onTap: () {
                 showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text('Confirm Logout'),
-                      content: const Text(
-                        'Are you sure you want to log out?',
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text('Cancel'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginPage()),
-                            );
-                          },
-                          child: const Text(
-                            'Logout',
-                            style: TextStyle(color: Colors.red),
-                          ),
-                        ),
-                      ],
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Confirm Logout'),
+                    content: const Text(
+                      'Are you sure you want to log out?',
                     ),
-                  );
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LoginPage()),
+                          );
+                        },
+                        child: const Text(
+                          'Logout',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
               },
             ),
           ],
@@ -106,33 +106,62 @@ class _PetProfilePageState extends State<PetProfilePage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            // <-------------------------------------------------- BLACK LINE --------------------------------------->
             Container(
               height: 40,
               color: Colors.black,
               width: double.infinity,
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  /*
-                  Text(
-                    'Missing',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
-                  Text(
-                    'Found',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
-                  */
-                ],
-              ),
             ),
             const SizedBox(
               height: 20,
             ),
-            // -------------------------------------------------------------------------- PROFILE ROW --------------------------------------------------------------------------
+            // <-------------------------------------------------- BLACK LINE END --------------------------------------->
+            const SizedBox(
+              height: 10,
+            ),
+            // <-------------------------------------------------------------------- PROFILE ROW ------------------------------------------------------->
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // <-------------------------------------------------- BACK BUTTON ICON  --------------------------------------->
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        color:
+                            Colors.black87, // Background color for the button
+                      ),
+                      child: Material(
+                        color: Colors
+                            .transparent, // Optional: Keeps the background transparent
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pop(
+                                context); // This returns to the previous screen
+                          },
+                          borderRadius: BorderRadius.circular(
+                              50), // Ripple effect adapts to borderRadius
+                          child: const Padding(
+                            padding: EdgeInsets.all(
+                                8.0), // Optional padding for better sizing
+                            child: Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              color: Colors.white, // Icon color
+                              size: 35,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                // <-------------------------------------------------- BACK BUTTON ICON END --------------------------------------->
+                const SizedBox(
+                  width: 10,
+                ),
+                // <--------------------------------------------------------- PROFILE PICTURE  ----------------------------------------------------------------->
                 SizedBox(
                   child: Container(
                     decoration: BoxDecoration(
@@ -151,15 +180,16 @@ class _PetProfilePageState extends State<PetProfilePage> {
                         ),
                         child: Image.asset(
                           'images/LOGO.png',
-                          width: 75,
-                          height: 75,
+                          width: 60,
+                          height: 60,
                         ),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(
-                  width: 10,
+                // <--------------------------------------------------------- PROFILE PICTURE END ----------------------------------------------------------------->
+                 const SizedBox(
+                  width: 5,
                 ),
                 const Text(
                   'Profile',

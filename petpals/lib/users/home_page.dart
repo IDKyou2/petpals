@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:petpals/users/dog_details_page.dart';
 import 'package:petpals/users/login_page.dart';
 import 'package:petpals/users/message_page.dart';
 import 'package:petpals/users/notifications_page.dart';
@@ -24,13 +25,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _tabController = TabController(length: 2, vsync: this);
   }
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
+  //<--------------------------------------------------------- FOR LOGOUT --------------------------------------------------------------------->
+  void logout(BuildContext context) async {
+    // Perform your async operation (e.g., logout process)
+    await Future.delayed(
+        const Duration(seconds: 2)); // Simulating an async task
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You have logged out successfully.'),
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
   }
 
-  // --------------------------------------------------------------------- FUNCTION FOR NAVIGATING PAGES ------------------------------------------------
+  //<----------------------------------------------------------- FOR LOGOUT END -------------------------------------------------->
+  // <------------------------------------------- FUNCTION FOR NAVIGATING PAGES -------------------------------------->
   void _navigateToAnotherPage(BuildContext context, Widget page,
       {VoidCallback? onReturn}) async {
     // Navigate to the new page
@@ -129,20 +141,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           child: const Text('Cancel'),
                         ),
                         TextButton(
-                          onPressed: () {
-                            Navigator.push(
+                          onPressed: () async {
+                            // Navigate to the LoginPage asynchronously
+                            await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const LoginPage()),
-                            ).then((_) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content:
-                                      Text('You have logged out successfully.'),
-                                  duration: Duration(seconds: 3),
-                                ),
-                              );
-                            });
+                                builder: (context) => const LoginPage(),
+                              ),
+                            );
+
+                            // After navigation, check if the widget is still mounted before calling logout
+                            if (context.mounted) {
+                              logout(context);
+                            }
                           },
                           child: const Text(
                             'Logout',
@@ -186,13 +197,20 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             color: Colors.grey, // change the color to grey
                             fontSize: 14,
                           ),
-                          suffixIcon: const Icon(Icons.search),
+                          suffixIcon: GestureDetector(
+                            child: const Icon(Icons.search),
+                            onTap: () {
+                              _searchController.clear();
+                              FocusScope.of(context)
+                                  .unfocus(); // Unfocus the search bar
+                            },
+                          ),
                         ),
                       ),
-                       //----------------------------------------------------------- SEARCH BAR END -----------------------------------------------------------
+                      //----------------------------------------------------------- SEARCH BAR END -----------------------------------------------------------
                     ),
                   ),
-                   //----------------------------------------------------------- CARD 1 -----------------------------------------------------------
+                  //----------------------------------------------------------- CARD 1 -----------------------------------------------------------
                   Card(
                     clipBehavior: Clip.hardEdge,
                     child: InkWell(
@@ -202,7 +220,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       },
                       child: Column(
                         children: [
-                    
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Container(
@@ -256,8 +273,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       Text(
                                         'German Shepherd',
                                         style: TextStyle(
-                                          color:
-                                              Colors.black, // Set the text color
+                                          color: Colors
+                                              .black, // Set the text color
                                           fontSize:
                                               15, // Set the text font size
                                           fontWeight: FontWeight
@@ -278,8 +295,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       Text(
                                         'Male',
                                         style: TextStyle(
-                                          color:
-                                              Colors.black, // Set the text color
+                                          color: Colors
+                                              .black, // Set the text color
                                           fontSize:
                                               15, // Set the text font size
                                           fontWeight: FontWeight
@@ -306,21 +323,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       ),
                                     ],
                                   ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        'More',
-                                        style: TextStyle(
-                                          fontSize:
-                                              15
-                                              , // Set the text font size
-                                          fontWeight: FontWeight
-                                              .bold, // Set the text font weight
-                                        ),
-                                      ),
-                                    ],
-                                  )
                                 ],
                               ),
                             ),
@@ -329,7 +331,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
-                   //----------------------------------------------------------- CARD 1 END -----------------------------------------------------------
+                  //----------------------------------------------------------- CARD 1 END -----------------------------------------------------------
                   Card(
                     clipBehavior: Clip.hardEdge,
                     child: InkWell(
@@ -1066,7 +1068,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               if (kDebugMode) {
                 print("Add icon is pressed.");
               }
-              _navigateToAnotherPage(context, const PetProfilePage());
+              _navigateToAnotherPage(context, const DogDetailsPage());
             },
             foregroundColor: Colors.white,
             backgroundColor: Colors.black,

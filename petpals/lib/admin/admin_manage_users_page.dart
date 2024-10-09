@@ -12,14 +12,20 @@ class AdminManageUsersPage extends StatefulWidget {
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
-  // --------------------------------------------------------------------- FUNCTION FOR NAVIGATING PAGES ------------------------------------------------
-  void _navigateToAnotherPage(BuildContext context, Widget page,
-      {VoidCallback? onReturn}) async {
-    if (onReturn != null) {
-      onReturn(); // Call the onReturn callback if it's not null
+  void logout(BuildContext context) async {
+    // Perform your async operation (e.g., logout process)
+    await Future.delayed(
+        const Duration(seconds: 2)); // Simulating an async task
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You have logged out successfully.'),
+          duration: Duration(seconds: 3),
+        ),
+      );
     }
   }
-  // ------------------------------------------------------------------------ END
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +66,43 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
                 style: TextStyle(color: Colors.red),
               ),
               onTap: () {
-                _navigateToAnotherPage(context, const LoginPage());
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Confirm Logout'),
+                    content: const Text(
+                      'Are you sure you want to log out?',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          // Navigate to the LoginPage asynchronously
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const LoginPage(),
+                            ),
+                          );
+
+                          // After navigation, check if the widget is still mounted before calling logout
+                          if (context.mounted) {
+                            logout(context);
+                          }
+                        },
+                        child: const Text(
+                          'Logout',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
               },
             ),
           ],
@@ -73,10 +115,11 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
           children: [
             Row(
               children: [
+                // <---------------------------------------------------- CIRCLE BACK BUTTON --------------------------------------------------->
                 Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.black, // Background color for the button
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.black87, // Background color for the button
                   ),
                   child: Material(
                     color: Colors
@@ -99,6 +142,7 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
                     ),
                   ),
                 ),
+                // <---------------------------------------------------- CIRCLE BACK BUTTON END --------------------------------------------------->
                 /*
                 Container(
                   decoration: BoxDecoration(

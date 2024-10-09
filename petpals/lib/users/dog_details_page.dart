@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:petpals/users/first_page.dart';
 import 'package:petpals/users/home_page.dart';
 
 class DogDetailsPage extends StatefulWidget {
@@ -66,35 +65,40 @@ class _DogDetailsPageState extends State<DogDetailsPage> {
               padding: const EdgeInsets.only(left: 0.0),
               child: Row(
                 children: [
-                  const SizedBox(
-                    width: 10,
-                  ),
+                  // <------------------------------------------- BACK ARROW BUTTON ------------------------------------------->
                   ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const FirstPage()),
-                        );
-                      },
-                      child: const Icon(Icons.arrow_back)),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    'Dog Details',
-                    style: TextStyle(
-                      fontFamily: GoogleFonts.poppins().fontFamily,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 20,
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Colors.black87, // Set the background color
+                      foregroundColor:
+                          Colors.white, // Set the foreground (text/icon) color
                     ),
+                    child: const Icon(
+                      Icons.arrow_back,
+                    ),
+                  ),
+                  // <------------------------------------------- BACK ARROW BUTTON END ------------------------------------------->
+                  const SizedBox(
+                    height: 50,
                   ),
                 ],
               ),
             ),
-            const SizedBox(
-              height: 20.0,
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Text(
+                'Pet details',
+                style: TextStyle(
+                  fontFamily: GoogleFonts.poppins().fontFamily,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 24,
+                ),
+              ),
             ),
+
             //-------------------------------------------------------------------------- IMAGE CONTAINER ----------------------------------------------------------------------------
             Padding(
               padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 10.0),
@@ -124,13 +128,19 @@ class _DogDetailsPageState extends State<DogDetailsPage> {
                   height: 40,
                   child: ElevatedButton(
                     onPressed: getImageGallery,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Colors.black87, // Set the background color
+                      foregroundColor:
+                          Colors.white, // Set the foreground (text/icon) color
+                    ),
                     child: const Text('Upload photo'),
                   ),
                 ),
               ),
             ),
             const SizedBox(
-              height: 20,
+              height: 10,
             ),
             Padding(
               padding: const EdgeInsets.only(
@@ -139,9 +149,9 @@ class _DogDetailsPageState extends State<DogDetailsPage> {
               ),
               child: TextFormField(
                 decoration: InputDecoration(
-                  labelText: 'Name',
+                  labelText: 'Pet name',
                   border: const OutlineInputBorder(),
-                  hintText: "Enter the name of your pet",
+                  hintText: "",
                   suffixIcon: _dogNameController.text.isEmpty
                       ? null
                       : IconButton(
@@ -171,9 +181,9 @@ class _DogDetailsPageState extends State<DogDetailsPage> {
               padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
               child: TextFormField(
                 decoration: InputDecoration(
-                  labelText: 'Age',
+                  labelText: 'Pet age',
                   border: const OutlineInputBorder(),
-                  hintText: "Enter your dog's age",
+                  hintText: "",
                   suffixIcon: _dogAgeController.text.isEmpty
                       ? null
                       : IconButton(
@@ -204,7 +214,7 @@ class _DogDetailsPageState extends State<DogDetailsPage> {
                 decoration: InputDecoration(
                   labelText: 'Breed',
                   border: const OutlineInputBorder(),
-                  hintText: "Enter your dog's breed",
+                  hintText: "",
                   suffixIcon: _dogBreedController.text.isEmpty
                       ? null
                       : IconButton(
@@ -235,7 +245,7 @@ class _DogDetailsPageState extends State<DogDetailsPage> {
                 decoration: InputDecoration(
                   labelText: 'Color',
                   border: const OutlineInputBorder(),
-                  hintText: "Enter your dog's color",
+                  hintText: "",
                   suffixIcon: _dogColorController.text.isEmpty
                       ? null
                       : IconButton(
@@ -266,7 +276,7 @@ class _DogDetailsPageState extends State<DogDetailsPage> {
                 decoration: InputDecoration(
                   labelText: 'Size (Small, Medium, Large)',
                   border: const OutlineInputBorder(),
-                  hintText: "Enter your dog's size",
+                  hintText: "",
                   suffixIcon: _dogSizeController.text.isEmpty
                       ? null
                       : IconButton(
@@ -297,7 +307,7 @@ class _DogDetailsPageState extends State<DogDetailsPage> {
                 decoration: InputDecoration(
                   labelText: 'Unique Markings/Features',
                   border: const OutlineInputBorder(),
-                  hintText: "Enter your dog's unique markings/features",
+                  hintText: "",
                   suffixIcon: _dogUniqueMarkingsController.text.isEmpty
                       ? null
                       : IconButton(
@@ -439,14 +449,6 @@ class _DogDetailsPageState extends State<DogDetailsPage> {
             ),
             const SizedBox(
               height: 20,
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                width: 100,
-                height: 100,
-                color: Colors.red,
-              ),
             ),
           ],
         ),

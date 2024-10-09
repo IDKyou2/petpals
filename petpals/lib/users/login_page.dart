@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:petpals/components/square_tile.dart';
+
 import 'package:petpals/users/home_page.dart';
 import 'package:petpals/users/registration_page.dart';
 
@@ -323,51 +323,7 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(
                       height: 50.0,
                     ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Divider(
-                            thickness: 0.5,
-                            color: Colors.grey[400],
-                          ),
-                        ),
-                        Text(
-                          ' Or continue with ',
-                          style: TextStyle(
-                            color: Colors.grey[700],
-                            fontSize: 14.0,
-                          ),
-                        ),
-                        Expanded(
-                          child: Divider(
-                            thickness: 1,
-                            color: Colors.grey[400],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        GestureDetector(
-                          child:
-                              const SquareTile(imagePath: 'images/google.png'),
-                          onTap: () {
-                            if (kDebugMode) {
-                              print(
-                                "Google logo tapped.",
-                              );
-                            }
-                          },
-                        ),
-                        const SizedBox(
-                          width: 5.0,
-                        ),
-                      ],
-                    )
+                    
                   ],
                 ),
               ),
