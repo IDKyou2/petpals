@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:petpals/users/home_page.dart';
+import 'package:petpals/users/registration_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({
@@ -30,6 +31,12 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _isAgreed = false; // State variable for the checkbox
 
+  void toggleCheckbox(bool? value) {
+    setState(() {
+      _isAgreed = value ?? false;
+    });
+  }
+
   void _navigateToAnotherPage(BuildContext context, Widget page) {
     Navigator.push(
       context,
@@ -37,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Future<void> _loginUser(
+  Future<void> loginUser(
       String username, String password, BuildContext context) async {
     try {
       // Fetch user data based on username
@@ -154,75 +161,139 @@ class _LoginPageState extends State<LoginPage> {
 
   //<------------------------------------------------------------ FOR TERMS AND CONDITIONS ------------------------------------------------------------>
   void showTermsDialog(BuildContext context) {
+    bool isAgreed = false; // Local state inside the dialog
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Petpals Registration Terms and Agreements',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'By registering, you agree to the following terms and conditions. Please read them carefully.',
-                    style: TextStyle(fontSize: 16, height: 1.5),
-                  ),
-                  const SizedBox(height: 10),
-                  // Your terms text...
-                  const SizedBox(height: 10),
-                  Row(
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: const Text(
+                'Petpals Registration Terms and Agreements',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              content: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Checkbox(
-                        value: _isAgreed, // Current checkbox state
-                        onChanged: (bool? value) {
-                          setState(() {
-                            _isAgreed =
-                                value ?? false; // Update state on change
-                          });
-                        },
+                      const Text(
+                        '''By registering, you agree to the following terms and conditions. Please read them carefully.
+
+  1. Introduction  
+  Welcome to Petpals, a mobile app designed to assist in reuniting lost and found pet dogs using advanced image recognition technology. By registering, you agree to the following terms and conditions to ensure a smooth experience with our service.
+
+  2. Acceptance of Terms  
+  By creating an account, you confirm that you have read, understood, and accepted these terms. If you do not agree to any part of these terms, please refrain from using Petpals.
+
+  3. Eligibility  
+  You must be at least 13 years old to create an account. By registering, you affirm that you meet this minimum age requirement.
+
+  4. Account Responsibilities  
+  - You are responsible for keeping your login credentials confidential.  
+  - Notify us immediately if you suspect unauthorized access to your account.  
+  - Petpals is not liable for any losses resulting from failure to secure your account.
+
+  5. Permitted Use  
+  You agree to use Petpals only for lawful activities that align with our mission to help lost pets. Avoid any action that could damage, disable, or interfere with the app or disrupt other users' experience.
+
+  6. Prohibited Activities  
+  By using Petpals, you agree not to:  
+  - Harass, threaten, or defame other users.  
+  - Upload or share content that is illegal, harmful, or offensive.  
+  - Impersonate any person or entity.  
+  - Use the app for unauthorized commercial purposes or spam activities.
+
+  7. Content Ownership  
+  All text, images, software, and content provided on Petpals are owned by us or our licensors. You may not reproduce, distribute, or create derivative works from any content without prior permission.
+
+  8. User-Generated Content  
+  By uploading pet photos or other content, you grant us a non-exclusive, worldwide, royalty-free license to use, modify, display, and distribute your content within the app. You confirm that you own or have permission to upload the content.
+
+  9. Privacy Policy  
+  We are committed to protecting your personal data. Please review our [Privacy Policy] to learn how we collect, use, and protect your information.
+
+  10. Account Suspension or Termination  
+  We reserve the right to suspend or terminate your account, with or without notice, if you violate these terms or engage in harmful activities.
+
+  11. Limitation of Liability  
+  To the fullest extent permitted by law, Petpals will not be liable for any indirect, incidental, or consequential damages resulting from your use of the platform.
+
+  12. Updates to Terms  
+  We may update these terms occasionally. If we make significant changes, we will notify you. Continued use of the app after updates means you accept the revised terms.
+
+  13. Governing Law  
+  These terms are governed by the laws of [Your Jurisdiction]. Any disputes will be resolved under these laws without regard to conflict of law principles.
+
+  14. Contact Information  
+  If you have questions or concerns, feel free to contact us:  
+  📱 0912-345-6789  
+  ✉️ support@petpals.com
+    ''',
+                        style: TextStyle(fontSize: 16, height: 1.25),
                       ),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _isAgreed =
-                                  !_isAgreed; // Toggle state on text tap
-                            });
-                          },
-                          child: const Text(
-                            'I agree to the Terms and Conditions',
-                            style: TextStyle(color: Colors.blue),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: isAgreed, // Use local state
+                            onChanged: (value) {
+                              setState(() {
+                                isAgreed = value ??
+                                    false; // Update state inside dialog
+                              });
+                            },
                           ),
-                        ),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  isAgreed =
+                                      !isAgreed; // Toggle state on text tap
+                                });
+                              },
+                              child: const Text(
+                                'I agree to the Terms and Conditions',
+                                style: TextStyle(color: Colors.blue),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: _isAgreed
-                  ? () {
-                      Navigator.of(context).pop();
-                      // Proceed to the next step, e.g., navigate to registration
-                    }
-                  : null, // Disable if not agreed
-              child: const Text('Confirm'),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: isAgreed
+                      ? () {
+                          Navigator.of(context).pop(); // Close dialog if agreed
+                          // Proceed to the next step, e.g., navigate to registration
+                        }
+                      : null, // Disable button if not agreed
+                  child: GestureDetector(
+                    child: const Text('Confirm'),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RegistrationPage(
+                                onTap: () {},
+                              )),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -351,25 +422,15 @@ class _LoginPageState extends State<LoginPage> {
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black),
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
-                            _formKey.currentState?.save();
-
-                            if (kDebugMode) {
-                              print(
-                                  'Username: $_username, Password: $_password');
-                            }
-                            _usernameController.clear();
-                            _passwordController.clear();
-                          }
-                          try {
-                            await _loginUser(_username!, _password!, context);
-                          } catch (e) {
-                            if (kDebugMode) {
-                              print('Error logging in: $e');
-                            }
-                          }
-                        },
+                        onPressed: _isAgreed
+                            ? () async {
+                                if (_formKey.currentState!.validate()) {
+                                  _formKey.currentState?.save();
+                                  await loginUser(
+                                      _username!, _password!, context);
+                                }
+                              }
+                            : null, // Disable button if terms not agreed
                         child: const Text(
                           'Login',
                           style: TextStyle(
