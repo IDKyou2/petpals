@@ -20,9 +20,10 @@ class Features extends StatelessWidget {
               ),
             ),
             // <------------------------- PERFECT SQUARE END ------------------------>
-            // <------------------------------------------- BACK ARROW BUTTON ------------------------------------------->
+            // <-----------------------   BACK ARROW BUTTON ------------------------------------------->
             ElevatedButton(
                 onPressed: () {
+                  // Move another page
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const FirstPage()),

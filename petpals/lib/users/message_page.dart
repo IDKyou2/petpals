@@ -68,7 +68,11 @@ class _MessagePageState extends State<MessagePage> {
                   style: TextStyle(color: Colors.red),
                 ),
                 onTap: () {
-                  _navigateToAnotherPage(context, const LoginPage());
+                  _navigateToAnotherPage(
+                      context,
+                      LoginPage(
+                        onTap: () {},
+                      ));
                 },
               ),
             ],

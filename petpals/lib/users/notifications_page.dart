@@ -47,28 +47,28 @@ class _NotificationsPageState extends State<NotificationsPage> {
         drawer: Drawer(
           child: ListView(
             children: <Widget>[
-            ListTile(
-              title: const Text('Home'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomePage()),
-                );
-              },
-            ),
-            ListTile(
-              title: const Text('Profile'),
-              onTap: () {
-                 _navigateToAnotherPage(context, const PetProfilePage());
-              },
-            ),
-            ListTile(
-              title: const Text(
-                'Logout',
-                style: TextStyle(color: Colors.red),
+              ListTile(
+                title: const Text('Home'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomePage()),
+                  );
+                },
               ),
-              onTap: () {
-                showDialog(
+              ListTile(
+                title: const Text('Profile'),
+                onTap: () {
+                  _navigateToAnotherPage(context, const PetProfilePage());
+                },
+              ),
+              ListTile(
+                title: const Text(
+                  'Logout',
+                  style: TextStyle(color: Colors.red),
+                ),
+                onTap: () {
+                  showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
                       title: const Text('Confirm Logout'),
@@ -87,7 +87,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const LoginPage()),
+                                  builder: (context) => LoginPage(
+                                        onTap: () {},
+                                      )),
                             );
                           },
                           child: const Text(
@@ -98,9 +100,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       ],
                     ),
                   );
-              },
-            ),
-          ],
+                },
+              ),
+            ],
           ),
         ),
         //-------------------------------------------------------------------------- BODY --------------------------------------------------------------------------

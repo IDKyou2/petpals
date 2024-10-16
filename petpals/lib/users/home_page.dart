@@ -146,7 +146,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const LoginPage(),
+                                builder: (context) => LoginPage(
+                                  onTap: () {},
+                                ),
                               ),
                             );
 
@@ -253,7 +255,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                             fontWeight: FontWeight.bold),
                                       ),
                                       Text(
-                                        '(time posted)',
+                                        '1h ago',
                                         style: TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.bold,

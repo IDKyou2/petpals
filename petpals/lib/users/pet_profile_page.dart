@@ -87,7 +87,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const LoginPage()),
+                                builder: (context) => LoginPage(onTap: () {  },)),
                           );
                         },
                         child: const Text(

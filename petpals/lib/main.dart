@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:petpals/admin/admin_homepage.dart';
+import 'package:petpals/auth/login_or_register.dart';
+
 import 'package:petpals/firebase_options.dart';
 
 Future<void> main() async {
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: '',
       home: Scaffold(
-        body: AdminHomepage(), // Add the LoginForm here
+        body: LoginOrRegisterPage(), // Add the LoginForm here
       ),
     );
   }

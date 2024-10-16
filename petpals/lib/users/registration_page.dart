@@ -6,7 +6,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class RegistrationPage extends StatefulWidget {
-  const RegistrationPage({super.key});
+  const RegistrationPage({
+    super.key,
+    required Null Function() onTap,
+  });
 
   @override
   State<RegistrationPage> createState() => _RegistrationPageState();
@@ -63,7 +66,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const LoginPage(),
+          builder: (context) => LoginPage(
+            onTap: () {},
+          ),
         ),
       );
     } catch (e) {
@@ -93,15 +98,23 @@ class _RegistrationPageState extends State<RegistrationPage> {
     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
   );
 
-//For hashing
   Future<void> _registerUser(BuildContext context, String username,
       String email, String password, String confirmPassword) async {
+    // Show loading indicator before starting the operation
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismissing the dialog manually
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
     try {
       await _firestore.collection('users').add({
         'username': username, // Use the parameter instead of the controller
         'email': email,
         'password': password, // Store the hashed password
       });
+      // show loading circle
 
       // Check if the context is still valid
       if (!context.mounted) return;
@@ -135,7 +148,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
   void _navigateToLoginPage() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const LoginPage()),
+      MaterialPageRoute(
+          builder: (context) => LoginPage(
+                onTap: () {},
+              )),
     );
   }
 
@@ -418,7 +434,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const LoginPage()),
+                                      builder: (context) => LoginPage(
+                                            onTap: () {},
+                                          )),
                                 );
                               },
                           ),

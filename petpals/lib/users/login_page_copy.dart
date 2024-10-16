@@ -6,14 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:petpals/users/home_page.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({
-    super.key,
-    required Null Function() onTap,
-  });
-
+  const LoginPage({super.key});
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
+
+// State variable for the checkbox
 
 class _LoginPageState extends State<LoginPage> {
   //initiate firestore firebase
@@ -28,7 +26,83 @@ class _LoginPageState extends State<LoginPage> {
   bool _showSuffixIcon = false;
   bool _showSuffixIconPassword = false;
 
-  bool _isAgreed = false; // State variable for the checkbox
+  //<------------------------------------------------------------ FOR TERMS AND CONDITIONS ------------------------------------------------------------>
+  void _showTermsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        bool? isChecked = false; // Local variable to store the checkbox value
+
+        return AlertDialog(
+          title: const Text('Terms and Conditions'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '''By registering, you agree to the following terms and conditions. Please read them carefully.''',
+                  style: TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  '''1. Usage of the app: You agree to use the app responsibly and in compliance with all applicable laws and regulations.''',
+                  style: TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  '''2. Privacy policy: We respect your privacy and are committed to protecting your personal data.''',
+                  style: TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  '''3. Liability: The app and its services are provided "as is" and we are not responsible for any issues that may arise.''',
+                  style: TextStyle(fontSize: 14),
+                ),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: isChecked,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          isChecked = value;
+                          // Update the isAgreed variable and rebuild the widget.
+                        });
+                      },
+                    ),
+                    const Text(
+                      'I agree to the Terms and Conditions',
+                      style: TextStyle(
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ],
+                ),
+                // Add more terms as needed
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Confirm'),
+              onPressed: () {
+                isChecked = true;
+
+                // Logic for when user agrees
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  //<------------------------------------------------------------ FOR TERMS AND CONDITIONS END ------------------------------------------------------------>
 
   void _navigateToAnotherPage(BuildContext context, Widget page) {
     Navigator.push(
@@ -142,93 +216,6 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
-  // reload page
-  void reloadPage(BuildContext context, Widget page) {
-    Navigator.pop(context); // Remove the current page
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => page), // Push the same page again
-    );
-  }
-
-  //<------------------------------------------------------------ FOR TERMS AND CONDITIONS ------------------------------------------------------------>
-  void showTermsDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Petpals Registration Terms and Agreements',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'By registering, you agree to the following terms and conditions. Please read them carefully.',
-                    style: TextStyle(fontSize: 16, height: 1.5),
-                  ),
-                  const SizedBox(height: 10),
-                  // Your terms text...
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: _isAgreed, // Current checkbox state
-                        onChanged: (bool? value) {
-                          setState(() {
-                            _isAgreed =
-                                value ?? false; // Update state on change
-                          });
-                        },
-                      ),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _isAgreed =
-                                  !_isAgreed; // Toggle state on text tap
-                            });
-                          },
-                          child: const Text(
-                            'I agree to the Terms and Conditions',
-                            style: TextStyle(color: Colors.blue),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: _isAgreed
-                  ? () {
-                      Navigator.of(context).pop();
-                      // Proceed to the next step, e.g., navigate to registration
-                    }
-                  : null, // Disable if not agreed
-              child: const Text('Confirm'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  //<------------------------------------------------------------ FOR TERMS AND CONDITIONS END ------------------------------------------------------------>
 
   @override
   Widget build(BuildContext context) {
@@ -398,16 +385,16 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
+                                  _showTermsDialog(
+                                      context); // Show Terms and Conditions
                                   /*
-                                  reloadPage(
-                                      context,
-                                      LoginPage(
-                                        onTap: () {},
-                                      ));
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const RegistrationPage()),
+                                  );
                                   */
-                                  setState(() {
-                                    showTermsDialog(context);
-                                  });
                                 },
                             ),
                           ],

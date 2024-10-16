@@ -71,7 +71,11 @@ class _FoundPageState extends State<FoundPage> {
                   style: TextStyle(color: Colors.red),
                 ),
                 onTap: () {
-                  _navigateToAnotherPage(context, const LoginPage());
+                  _navigateToAnotherPage(
+                      context,
+                      LoginPage(
+                        onTap: () {},
+                      ));
                 },
               ),
             ],
@@ -129,7 +133,7 @@ class _FoundPageState extends State<FoundPage> {
                   ],
                 ),
               ),
-             
+
               Padding(
                 padding: const EdgeInsets.only(top: 10.0, bottom: 15.0),
                 child: SizedBox(
