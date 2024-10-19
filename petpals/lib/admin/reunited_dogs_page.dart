@@ -61,7 +61,7 @@ class _ReunitedDogsPageState extends State<ReunitedDogsPage> {
                 style: TextStyle(color: Colors.red),
               ),
               onTap: () {
-                _navigateToAnotherPage(context, LoginPage(onTap: () {  },));
+                _navigateToAnotherPage(context, const LoginPage());
               },
             ),
           ],

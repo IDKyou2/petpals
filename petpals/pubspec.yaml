@@ -45,6 +45,7 @@ dependencies:
   cloud_firestore: ^5.4.1
   crypto: ^3.0.1
   argon2: ^1.0.1
+  supabase_flutter: ^2.8.0
 
 
 

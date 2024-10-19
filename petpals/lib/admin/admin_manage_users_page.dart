@@ -86,7 +86,7 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
                           await Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => LoginPage(onTap: () {  },),
+                              builder: (context) => const LoginPage(),
                             ),
                           );
 

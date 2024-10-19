@@ -6,6 +6,7 @@ import 'package:petpals/users/login_page.dart';
 import 'package:petpals/users/message_page.dart';
 import 'package:petpals/users/notifications_page.dart';
 import 'package:petpals/users/pet_profile_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,6 +16,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+  final supabase = Supabase.instance.client;
+
   final _searchController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late final TabController _tabController;
@@ -25,23 +28,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _tabController = TabController(length: 2, vsync: this);
   }
 
-  //<--------------------------------------------------------- FOR LOGOUT --------------------------------------------------------------------->
-  void logout(BuildContext context) async {
-    // Perform your async operation (e.g., logout process)
-    await Future.delayed(
-        const Duration(seconds: 2)); // Simulating an async task
-
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('You have logged out successfully.'),
-          duration: Duration(seconds: 3),
-        ),
-      );
-    }
+  Future<void> logOut() async {
+    await supabase.auth.signOut();
+    if (!mounted) return;
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginPage(),
+        ));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Logged out successfully.'),
+      ),
+    );
   }
 
-  //<----------------------------------------------------------- FOR LOGOUT END -------------------------------------------------->
   // <------------------------------------------- FUNCTION FOR NAVIGATING PAGES -------------------------------------->
   void _navigateToAnotherPage(BuildContext context, Widget page,
       {VoidCallback? onReturn}) async {
@@ -142,20 +143,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ),
                         TextButton(
                           onPressed: () async {
-                            // Navigate to the LoginPage asynchronously
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => LoginPage(
-                                  onTap: () {},
-                                ),
-                              ),
-                            );
-
-                            // After navigation, check if the widget is still mounted before calling logout
-                            if (context.mounted) {
-                              logout(context);
-                            }
+                            logOut();
                           },
                           child: const Text(
                             'Logout',

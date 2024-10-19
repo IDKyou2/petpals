@@ -70,8 +70,8 @@ class _MessagePageState extends State<MessagePage> {
                 onTap: () {
                   _navigateToAnotherPage(
                       context,
-                      LoginPage(
-                        onTap: () {},
+                      const LoginPage(
+                     
                       ));
                 },
               ),

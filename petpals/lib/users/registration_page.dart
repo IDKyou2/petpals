@@ -1,14 +1,14 @@
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:petpals/users/login_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({
     super.key,
-    required Null Function() onTap,
   });
 
   @override
@@ -16,31 +16,34 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
+  final supabase = Supabase.instance.client;
+
   //initiate firestore firebase
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  //final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   final _formKey = GlobalKey<FormState>();
 
-  final _usernameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
+  final usernameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
 
   @override
   void dispose() {
-    _usernameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
+    usernameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
     super.dispose();
   }
 
+  /*
   void _registerAndNavigate(BuildContext context) async {
     // Ensure that the fields are filled
-    if (_usernameController.text.isEmpty ||
-        _emailController.text.isEmpty ||
-        _passwordController.text.isEmpty ||
-        _confirmPasswordController.text.isEmpty) {
+    if (usernameController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        passwordController.text.isEmpty ||
+        confirmPasswordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill in all fields.'),
@@ -51,12 +54,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
     try {
       // Pass the values from the controllers
-      await _registerUser(
+      await registerUser(
         context,
-        _usernameController.text, // Use controller's text
-        _emailController.text,
-        _passwordController.text,
-        _confirmPasswordController.text,
+        usernameController.text.trim(), // Use controller's text
+        emailController.text.trim(),
+        passwordController.text.trim(),
+        confirmPasswordController.text.trim(),
       );
 
       // Check if the context is still valid
@@ -66,9 +69,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => LoginPage(
-            onTap: () {},
-          ),
+          builder: (context) => const LoginPage(),
         ),
       );
     } catch (e) {
@@ -83,6 +84,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       );
     }
   }
+  */
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -98,8 +100,43 @@ class _RegistrationPageState extends State<RegistrationPage> {
     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
   );
 
-  Future<void> _registerUser(BuildContext context, String username,
-      String email, String password, String confirmPassword) async {
+  Future<void> signUp() async {
+    try {
+      await supabase.auth.signUp(
+          password: passwordController.text.trim(),
+          email: emailController.text.trim(),
+          data: {"username": usernameController.text.trim()});
+      if (!mounted) return;
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LoginPage(),
+          ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Account created successfully.'),
+        ),
+      );
+    } on AuthException catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+  }
+
+  // Signout
+  Future<void> logOut() async {
+    await supabase.auth.signOut();
+    if (!mounted) return;
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginPage(),
+        ));
+  }
+
+  Future<void> addUser(BuildContext context, String username, String email,
+      String password, String confirmPassword) async {
     // Show loading indicator before starting the operation
     showDialog(
       context: context,
@@ -109,11 +146,19 @@ class _RegistrationPageState extends State<RegistrationPage> {
       ),
     );
     try {
+      /*
       await _firestore.collection('users').add({
         'username': username, // Use the parameter instead of the controller
         'email': email,
         'password': password, // Store the hashed password
       });
+      */
+      await supabase.from('users').insert({
+        'username': username,
+        'email': email,
+        'password': password,
+      });
+
       // show loading circle
 
       // Check if the context is still valid
@@ -129,6 +174,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
       if (!context.mounted) return;
 
       _navigateToLoginPage();
+      if (kDebugMode) {
+        print('Account created successfully.');
+      }
     } catch (e) {
       if (kDebugMode) {
         print('Error creating user: $e');
@@ -148,10 +196,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   void _navigateToLoginPage() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-          builder: (context) => LoginPage(
-                onTap: () {},
-              )),
+      MaterialPageRoute(builder: (context) => const LoginPage()),
     );
   }
 
@@ -160,12 +205,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          //mainAxisAlignment: MainAxisAlignment.center,
+          //crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Padding(
-              padding:
-                  const EdgeInsets.only(left: 50.0, right: 50.0, top: 50.0),
+              padding: const EdgeInsets.only(
+                left: 50.0,
+                right: 50.0,
+              ),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -173,10 +220,22 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   children: <Widget>[
                     Image.asset('images/LOGO_clear.png',
                         width: 200, height: 200), // Set the image size
-                    const SizedBox(height: 20),
+                    const Column(
+                      children: [
+                        Text(
+                          "Register Now",
+                          style: TextStyle(
+                            fontSize: 15,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        )
+                      ],
+                    ),
                     //------------------------------------------------------------------- textformfield start ------------------------------------------------------------------
                     TextFormField(
-                      controller: _usernameController,
+                      controller: usernameController,
                       onChanged: (userInput) {
                         if (userInput.isNotEmpty) {
                           setState(() {
@@ -204,7 +263,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             ? IconButton(
                                 icon: const Icon(Icons.close),
                                 onPressed: () {
-                                  _usernameController
+                                  usernameController
                                       .clear(); // Clear the controller
                                   setState(() {
                                     _showSuffixIconUsername = false;
@@ -228,7 +287,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     const SizedBox(height: 10),
                     //------------------------------------------------------------------- textformfield start ------------------------------------------------------------------
                     TextFormField(
-                      controller: _emailController,
+                      controller: emailController,
                       onChanged: (email) {
                         if (email.isNotEmpty) {
                           setState(() {
@@ -256,7 +315,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             ? IconButton(
                                 icon: const Icon(Icons.close),
                                 onPressed: () {
-                                  _emailController
+                                  emailController
                                       .clear(); // Clear the controller
                                   setState(() {
                                     _showSuffixIconEmail = false;
@@ -311,7 +370,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               )
                             : null,
                       ),
-                      controller: _passwordController,
+                      controller: passwordController,
                       onChanged: (passwordInput) {
                         if (passwordInput.isNotEmpty) {
                           setState(() {
@@ -362,7 +421,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               )
                             : null,
                       ),
-                      controller: _confirmPasswordController,
+                      controller: confirmPasswordController,
                       onChanged: (confirmPasswordInput) {
                         if (confirmPasswordInput.isNotEmpty) {
                           setState(() {
@@ -400,7 +459,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               );
                             }
                             // Call this method in your widget's context
-                            _registerAndNavigate(context);
+                            //_registerAndNavigate(context);
+                            signUp();
                           }
                         },
                         child: const Text(
@@ -434,15 +494,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => LoginPage(
-                                            onTap: () {},
-                                          )),
+                                      builder: (context) => const LoginPage()),
                                 );
                               },
                           ),
                         ],
                       ),
                     ),
+                    const SizedBox(
+                      height: 50,
+                    )
                   ],
                 ),
               ),

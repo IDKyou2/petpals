@@ -71,11 +71,7 @@ class _FoundPageState extends State<FoundPage> {
                   style: TextStyle(color: Colors.red),
                 ),
                 onTap: () {
-                  _navigateToAnotherPage(
-                      context,
-                      LoginPage(
-                        onTap: () {},
-                      ));
+                  _navigateToAnotherPage(context, const LoginPage());
                 },
               ),
             ],

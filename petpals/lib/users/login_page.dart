@@ -1,15 +1,17 @@
-import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'dart:async';
+//import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:petpals/users/home_page.dart';
+//import 'package:petpals/users/home_page.dart';
 import 'package:petpals/users/registration_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({
     super.key,
-    required Null Function() onTap,
+    //required Null Function() onTap,
   });
 
   @override
@@ -17,94 +19,24 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final supabase = Supabase.instance.client;
   //initiate firestore firebase
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final _formKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
+  //final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  String? _username;
-  String? _password;
+  final _formKey = GlobalKey<FormState>();
+  final usernameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
   bool _obscurePassword = true;
   bool _showSuffixIcon = false;
   bool _showSuffixIconPassword = false;
 
-  bool _isAgreed = false; // State variable for the checkbox
-
   void toggleCheckbox(bool? value) {
-    setState(() {
-      _isAgreed = value ?? false;
-    });
+    setState(() {});
   }
 
-  void _navigateToAnotherPage(BuildContext context, Widget page) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => page),
-    );
-  }
-
-  Future<void> loginUser(
-      String username, String password, BuildContext context) async {
-    try {
-      // Fetch user data based on username
-      final user = await _firestore
-          .collection('users')
-          .where('username', isEqualTo: username)
-          .where('password', isEqualTo: password)
-          .get();
-
-      // Check if user exists
-      if (user.docs.isEmpty) {
-        if (context.mounted && password.isNotEmpty && username.isNotEmpty) {
-          _passwordController.clear();
-          _showErrorDialog(context, 'Invalid credentials. Try again.');
-        }
-        return;
-      }
-
-      // Retrieve user data
-      final userData = user.docs.first.data();
-      final storedPassword = userData['password'];
-
-      // Compare the provided password with the stored password
-      if (password.isNotEmpty &&
-          username.isNotEmpty &&
-          password != storedPassword) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Incorrect username or password.'),
-            ),
-          );
-        }
-        _usernameController.clear();
-        _passwordController.clear();
-        return;
-      }
-
-      if (kDebugMode) {
-        print('Login successful');
-      }
-
-      // Navigate to HomePage if login is successful
-      if (context.mounted) {
-        _navigateToAnotherPage(context, const HomePage());
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Logged in successfully.'),
-            duration: Duration(seconds: 3),
-          ),
-        );
-      }
-    } catch (e) {
-      // Show error dialog on exception
-      if (context.mounted) {
-        _showErrorDialog(context, 'Error logging in: $e');
-      }
-    }
-  }
-
+/*
   void _showErrorDialog(BuildContext context, String message) {
     showDialog(
       context: context,
@@ -149,6 +81,7 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+*/
 
   // reload page
   void reloadPage(BuildContext context, Widget page) {
@@ -157,6 +90,30 @@ class _LoginPageState extends State<LoginPage> {
       context,
       MaterialPageRoute(builder: (context) => page), // Push the same page again
     );
+  }
+
+  Future<void> loginUser() async {
+    try {
+      await supabase.auth.signInWithPassword(
+        password: passwordController.text.trim(),
+        email: emailController.text.trim(),
+      );
+      if (!mounted) return;
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const HomePage(),
+          ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Logged in successfully.'),
+        ),
+      );
+    } on AuthException catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
   }
 
   //<------------------------------------------------------------ FOR TERMS AND CONDITIONS ------------------------------------------------------------>
@@ -281,15 +238,16 @@ class _LoginPageState extends State<LoginPage> {
                         }
                       : null, // Disable button if not agreed
                   child: GestureDetector(
-                    child: const Text('Confirm'),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => RegistrationPage(
-                                onTap: () {},
-                              )),
-                    ),
-                  ),
+                      child: const Text('Confirm'),
+                      onTap: () {
+                        if (isAgreed != false) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const RegistrationPage()),
+                          );
+                        }
+                      }),
                 ),
               ],
             );
@@ -320,31 +278,44 @@ class _LoginPageState extends State<LoginPage> {
                   children: <Widget>[
                     Image.asset('images/LOGO_clear.png',
                         width: 200, height: 200), // Set the image size
-                    const SizedBox(height: 20),
+                    const Column(
+                      children: [
+                        Text(
+                          "Login here",
+                          style: TextStyle(
+                            fontSize: 15,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        )
+                      ],
+                    ),
+
                     TextFormField(
-                      controller: _usernameController,
-                      onChanged: (userInput) {
+                      controller: emailController,
+                      onChanged: (emailInput) {
                         setState(() {
-                          _showSuffixIcon = userInput.isNotEmpty;
+                          _showSuffixIcon = emailInput.isNotEmpty;
                         });
                       },
                       decoration: InputDecoration(
-                        labelText: 'Username',
+                        labelText: 'Email',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(25.0),
                         ),
-                        hintText: 'Enter your username',
+                        hintText: 'Enter your email',
                         floatingLabelBehavior: FloatingLabelBehavior.never,
                         hintStyle: const TextStyle(
                           color: Colors.grey, // hint text color
                           fontSize: 15,
                         ),
-                        prefixIcon: const Icon(Icons.person),
+                        prefixIcon: const Icon(Icons.email),
                         suffixIcon: _showSuffixIcon
                             ? IconButton(
                                 icon: const Icon(Icons.close),
                                 onPressed: () {
-                                  _usernameController.clear();
+                                  emailController.clear();
                                   setState(() {
                                     _showSuffixIcon = false;
                                   });
@@ -355,13 +326,13 @@ class _LoginPageState extends State<LoginPage> {
                               )
                             : null,
                       ),
-                      validator: (username) {
-                        if (username == null || username.isEmpty) {
-                          return 'Username is required.';
+                      validator: (email) {
+                        if (email == null || email.isEmpty) {
+                          return 'Email is required.';
                         }
                         return null;
                       },
-                      onSaved: (username) => _username = username ?? '',
+                      onSaved: (email) => email = email ?? '',
                     ),
 
                     //------------------------------------------------------------------- textformfield end -------------------------------------------------------------------
@@ -394,7 +365,7 @@ class _LoginPageState extends State<LoginPage> {
                               )
                             : null,
                       ),
-                      controller: _passwordController,
+                      controller: passwordController,
                       onChanged: (passwordInput) {
                         if (passwordInput.isNotEmpty) {
                           setState(() {
@@ -412,7 +383,7 @@ class _LoginPageState extends State<LoginPage> {
                         }
                         return null;
                       },
-                      onSaved: (password) => _password = password!,
+                      onSaved: (password) => password = password!,
                     ),
                     //------------------------------------------------------------------- textformfield end -------------------------------------------------------------------
                     const SizedBox(height: 10),
@@ -422,21 +393,22 @@ class _LoginPageState extends State<LoginPage> {
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black),
-                        onPressed: _isAgreed
-                            ? () async {
-                                if (_formKey.currentState!.validate()) {
-                                  _formKey.currentState?.save();
-                                  await loginUser(
-                                      _username!, _password!, context);
-                                }
-                              }
-                            : null, // Disable button if terms not agreed
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            _formKey.currentState?.save();
+                          }
+                          if (kDebugMode) {
+                            print(emailController.text);
+                            print(passwordController.text);
+                          }
+                          loginUser();
+                        },
                         child: const Text(
                           'Login',
                           style: TextStyle(
                               fontSize: 17,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
                         ),
                       ),
                     ),
@@ -459,13 +431,6 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
-                                  /*
-                                  reloadPage(
-                                      context,
-                                      LoginPage(
-                                        onTap: () {},
-                                      ));
-                                  */
                                   setState(() {
                                     showTermsDialog(context);
                                   });

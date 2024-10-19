@@ -4,6 +4,22 @@ import 'package:petpals/users/first_page.dart';
 class Features extends StatelessWidget {
   const Features({super.key});
 
+  /*
+ void _navigateToAnotherPage(BuildContext context, Widget page) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => page),
+    );
+  }
+  */
+
+  /*
+  reloadPage(
+      context,
+      LoginPage(
+        onTap: () {},
+      ));
+  */
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,6 +36,7 @@ class Features extends StatelessWidget {
               ),
             ),
             // <------------------------- PERFECT SQUARE END ------------------------>
+
             // <-----------------------   BACK ARROW BUTTON ------------------------------------------->
             ElevatedButton(
                 onPressed: () {

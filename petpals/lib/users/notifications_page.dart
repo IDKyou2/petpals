@@ -87,8 +87,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => LoginPage(
-                                        onTap: () {},
+                                  builder: (context) => const LoginPage(
+                                     
                                       )),
                             );
                           },
