@@ -51,50 +51,93 @@ class _RegistrationPageState extends State<RegistrationPage> {
     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
   );
 
-  Future<void> signUp(username, email, password) async {
-    try {
-      showDialog(
-        context: context,
-        barrierDismissible: false, // Prevent dismissing the dialog manually
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-      await supabase.auth.signUp(
-          password: passwordController.text.trim(),
-          email: emailController.text.trim(),
-          data: {
-            "username": usernameController.text.trim(),
-          });
+  Future<void> signUp(String username, String email, String password) async {
+  if (!mounted) return; // Check if widget is still in the tree
 
+  // Show loading dialog
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Prevent dismissing the dialog manually
+    builder: (context) => const Center(
+      child: CircularProgressIndicator(),
+    ),
+  );
+
+  try {
+    // Sign up the user with Supabase
+    final response = await supabase.auth.signUp(
+      email: email.trim(),
+      password: password.trim(),
+      data: {
+        "username": username.trim(),
+      },
+    );
+
+    // Check if the sign-up was successful
+    if (response.user != null) {
+      // Insert user details into the 'users' table
       await supabase.from('users').insert({
-        'username': username,
-        'email': email,
-        'password': password,
+        'username': username.trim(),
+        'email': email.trim(),
+        'password': password.trim(), // Note: Storing plain passwords is not recommended
         'user_profile': 'user',
         'status': 'active',
       });
 
-      if (!mounted) return; // Check before using context
-      //createUser(context, username, email, password, confirmPassword);
-      Navigator.pushReplacement(
+      // Close the loading dialog
+      if (mounted) {
+        Navigator.pop(context); // Dismiss the loading dialog
+
+        // Navigate to the login page
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => const LoginPage(),
-          ));
+          ),
+        );
 
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Account created successfully.'),
+          ),
+        );
+      }
+    } else {
+      // Handle sign-up failure (e.g., user already exists)
+      if (mounted) {
+        Navigator.pop(context); // Dismiss the loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to create account.'),
+          ),
+        );
+      }
+    }
+  } on AuthException catch (e) {
+    // Handle authentication exceptions
+    if (mounted) {
+      Navigator.pop(context); // Dismiss the loading dialog
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Account created successfully.'),
-        ),
+        SnackBar(content: Text(e.message)), // Show specific error message
       );
-    } on AuthException catch (e) {
-      if (!mounted) return;
       if (kDebugMode) {
-        print(e);
+        print('AuthException: ${e.message}');
+      }
+    }
+  } catch (e) {
+    // Handle other exceptions
+    if (mounted) {
+      Navigator.pop(context); // Dismiss the loading dialog
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('An unexpected error occurred.')),
+      );
+      if (kDebugMode) {
+        print('Error: $e');
       }
     }
   }
+}
 
   // Add or Insert user
   Future<void> createUser(
@@ -406,7 +449,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             }
                             // Call this method in your widget's context
                             //_registerAndNavigate(context);
-                            signUp(username, email, password);
+                            signUp(username!, email!, password!);
                           }
                         },
                         child: const Text(

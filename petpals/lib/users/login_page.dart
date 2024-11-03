@@ -99,52 +99,76 @@ class _LoginPageState extends State<LoginPage> {
     return regExp.hasMatch(email);
   }
 
-  Future<void> loginUser() async {
-    try {
-      await supabase.auth.signInWithPassword(
-        password: passwordController.text.trim(),
-        email: emailController.text.trim(),
-      );
-      if (!mounted) return;
-      showDialog(
-        context: context,
-        barrierDismissible: false, // Prevent dismissing the dialog manually
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-      Navigator.pushReplacement(
+  Future<void> loginUser () async {
+  if (!mounted) return; // Check if widget is still in the tree
+
+  // Show loading dialog
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => const Center(
+      child: CircularProgressIndicator(),
+    ),
+  );
+
+  try {
+    final response = await supabase.auth.signInWithPassword(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
+
+    final session = response.session;
+    if (session != null) {
+      if (kDebugMode) {
+        print('User  signed in: ${session.user.id}');
+      }
+
+      // Close the loading dialog
+      if (mounted) {
+        Navigator.pop(context);
+        // Navigate to home page
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => const HomePage(),
-          ));
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Logged in successfully.'),
-        ),
-      );
-    } on AuthException catch (e) {
-      // Handle the invalid credentials case
-      if (e.message.toLowerCase().contains('invalid login credentials')) {
-        showErrorDialog(
-            context, "Invalid email or password. Please try again.");
-        /*
+          ),
+        );
+
+        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('You have entered invalid email or password.')),
+            content: Text('Logged in successfully.'),
+          ),
         );
-        */
+      }
+    } else {
+      // If sign-in fails for some reason
+      if (mounted) {
+        Navigator.pop(context); // Dismiss the loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to sign in.'),
+          ),
+        );
+      }
+    }
+  } on AuthException catch (e) {
+    // Dismiss the loading dialog if there's an error
+    if (mounted) {
+      Navigator.pop(context); 
+      if (e.message.toLowerCase().contains('invalid login credentials')) {
+        showErrorDialog(context, "Invalid email or password. Please try again.");
       } else {
-        // Handle other possible exceptions
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(e.message)),
         );
       }
       if (kDebugMode) {
-        print(e);
+        print('AuthException: ${e.message}');
       }
     }
   }
+}
 
   //<------------------------------------------------------------ FOR TERMS AND CONDITIONS ------------------------------------------------------------>
   void showTermsDialog(BuildContext context) {

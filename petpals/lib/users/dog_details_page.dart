@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:petpals/users/home_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DogDetailsPage extends StatefulWidget {
   const DogDetailsPage({super.key});
@@ -19,6 +20,7 @@ enum Gender {
 }
 
 class _DogDetailsPageState extends State<DogDetailsPage> {
+  final supabase = Supabase.instance.client;
   final _dogNameController = TextEditingController();
   final _dogAgeController = TextEditingController();
   final _dogBreedController = TextEditingController();
