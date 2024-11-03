@@ -63,16 +63,35 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Scaffold(
         key: _scaffoldKey, // Assign the key to the Scaffold
         appBar: AppBar(
+          backgroundColor: Colors.transparent,
           automaticallyImplyLeading: false, // Add this line
           leading: null, // Ensure the leading icon is set to null
-          title: Image.asset(
-            'images/LOGO_clear.png',
-            fit: BoxFit.fill, // Ensures the logo fits within the title area
-            height: 80, // Adjust the height to fit your logo
+          title: ClipOval(
+            child: Image.asset(
+              //Logo
+              'images/LOGO.png',
+
+              //fit: BoxFit.fill, // Ensures the logo fits within the title area
+              fit: BoxFit.cover, // Scale the image to cover the circle
+              height: 50, // Adjust the height to fit your logo
+              width: 50,
+              errorBuilder: (context, error, stackTrace) {
+                return ClipOval(
+                  child: Container(
+                    color: Colors.grey, // Placeholder color
+                    height: 50,
+                    width: 50,
+                    child: const Center(child: Icon(Icons.error)), // Error icon
+                  ),
+                );
+              },
+            ),
           ),
 
           actions: <Widget>[
+            //Hamburger icon
             IconButton(
+              color: Colors.black,
               icon: const Icon(Icons.menu),
               onPressed: () {
                 _scaffoldKey.currentState?.openDrawer();
@@ -84,10 +103,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 fontSize: 18.0,
                 fontWeight: FontWeight.bold,
                 color: Colors.black),
+            //For Underline tab
             indicator: const UnderlineTabIndicator(
               borderSide: BorderSide(color: Colors.black, width: 2.0),
             ),
             controller: _tabController,
+
             tabs: <Widget>[
               Container(
                 color: Colors.transparent,

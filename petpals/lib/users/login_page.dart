@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:petpals/users/home_page.dart';
 import 'package:petpals/users/registration_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -30,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
   final FocusNode passwordFocusNode = FocusNode();
 
   bool _obscurePassword = true;
-  bool _showSuffixIcon = false;
+  //bool _showSuffixIcon = false;
   bool _showSuffixIconPassword = false;
 
   @override
@@ -105,6 +106,13 @@ class _LoginPageState extends State<LoginPage> {
         email: emailController.text.trim(),
       );
       if (!mounted) return;
+      showDialog(
+        context: context,
+        barrierDismissible: false, // Prevent dismissing the dialog manually
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -118,7 +126,8 @@ class _LoginPageState extends State<LoginPage> {
     } on AuthException catch (e) {
       // Handle the invalid credentials case
       if (e.message.toLowerCase().contains('invalid login credentials')) {
-        showErrorDialog(context, "Invalid email or password.");
+        showErrorDialog(
+            context, "Invalid email or password. Please try again.");
         /*
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -302,15 +311,16 @@ class _LoginPageState extends State<LoginPage> {
                   children: <Widget>[
                     Image.asset('images/LOGO_clear.png',
                         width: 200, height: 200), // Set the image size
-                    const Column(
+                    Column(
                       children: [
                         Text(
                           "Login here",
-                          style: TextStyle(
+                          style: GoogleFonts.libreFranklin(
                             fontSize: 15,
+                            fontWeight: FontWeight.w900,
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         )
                       ],
@@ -322,7 +332,7 @@ class _LoginPageState extends State<LoginPage> {
                       controller: emailController,
                       onChanged: (emailInput) {
                         setState(() {
-                          _showSuffixIcon = emailInput.isNotEmpty;
+                          //_showSuffixIcon = emailInput.isNotEmpty;
                         });
                       },
                       decoration: InputDecoration(
@@ -337,6 +347,7 @@ class _LoginPageState extends State<LoginPage> {
                           fontSize: 15,
                         ),
                         prefixIcon: const Icon(Icons.email),
+                        /*
                         suffixIcon: _showSuffixIcon
                             ? IconButton(
                                 icon: const Icon(Icons.close),
@@ -351,10 +362,11 @@ class _LoginPageState extends State<LoginPage> {
                                 },
                               )
                             : null,
+                        */
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Email is required';
+                          return 'Email is required.';
                         } else if (!isValidEmail(value)) {
                           return 'Please enter a valid email';
                         }

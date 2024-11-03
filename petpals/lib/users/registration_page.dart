@@ -1,6 +1,7 @@
 import 'dart:async';
 //import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:petpals/users/login_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   //initiate firestore firebase
   //final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   final _formKey = GlobalKey<FormState>();
 
   final usernameController = TextEditingController();
@@ -37,106 +37,68 @@ class _RegistrationPageState extends State<RegistrationPage> {
     super.dispose();
   }
 
-  /*
-  void _registerAndNavigate(BuildContext context) async {
-    // Ensure that the fields are filled
-    if (usernameController.text.isEmpty ||
-        emailController.text.isEmpty ||
-        passwordController.text.isEmpty ||
-        confirmPasswordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill in all fields.'),
-        ),
-      );
-      return;
-    }
-
-    try {
-      // Pass the values from the controllers
-      await registerUser(
-        context,
-        usernameController.text.trim(), // Use controller's text
-        emailController.text.trim(),
-        passwordController.text.trim(),
-        confirmPasswordController.text.trim(),
-      );
-
-      // Check if the context is still valid
-      if (!context.mounted) return;
-
-      // Navigate to LoginPage if the widget is still mounted
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const LoginPage(),
-        ),
-      );
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error registering user: $e');
-      }
-      // Display error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error registering user. Please try again.'),
-        ),
-      );
-    }
-  }
-  */
-
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  bool _showSuffixIconUsername = false;
-  bool _showSuffixIconEmail = false;
+  //bool _showSuffixIconUsername = false;
+  //bool _showSuffixIconEmail = false;
   bool _showSuffixIconPassword = false;
   bool _showSuffixIconConfirmPassword = false;
 
-  String? _username, _email, _password, _confirmPassword;
+  String? username, email, password, confirmPassword;
 
   // For validations
   final emailRegExp = RegExp(
     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
   );
 
-  Future<void> signUp() async {
+  Future<void> signUp(username, email, password) async {
     try {
+      showDialog(
+        context: context,
+        barrierDismissible: false, // Prevent dismissing the dialog manually
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
       await supabase.auth.signUp(
           password: passwordController.text.trim(),
           email: emailController.text.trim(),
-          data: {"username": usernameController.text.trim()});
-      if (!mounted) return;
+          data: {
+            "username": usernameController.text.trim(),
+          });
+
+      await supabase.from('users').insert({
+        'username': username,
+        'email': email,
+        'password': password,
+        'user_profile': 'user',
+        'status': 'active',
+      });
+
+      if (!mounted) return; // Check before using context
+      //createUser(context, username, email, password, confirmPassword);
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => const LoginPage(),
           ));
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Account created successfully.'),
         ),
       );
     } on AuthException catch (e) {
+      if (!mounted) return;
       if (kDebugMode) {
         print(e);
       }
     }
   }
 
-  // Signout
-  Future<void> logOut() async {
-    await supabase.auth.signOut();
-    if (!mounted) return;
-    Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const LoginPage(),
-        ));
-  }
-
-  Future<void> addUser(BuildContext context, String username, String email,
-      String password, String confirmPassword) async {
+  // Add or Insert user
+  Future<void> createUser(
+      BuildContext context, username, email, password, confirmPassword) async {
     // Show loading indicator before starting the operation
     showDialog(
       context: context,
@@ -157,6 +119,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
         'username': username,
         'email': email,
         'password': password,
+        'user_profile': 'user',
+        'status': 'active',
       });
 
       // show loading circle
@@ -193,6 +157,17 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
+  // Signout
+  Future<void> logOut() async {
+    await supabase.auth.signOut();
+    if (!mounted) return;
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginPage(),
+        ));
+  }
+
   void _navigateToLoginPage() {
     Navigator.push(
       context,
@@ -220,69 +195,56 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   children: <Widget>[
                     Image.asset('images/LOGO_clear.png',
                         width: 200, height: 200), // Set the image size
-                    const Column(
+                    Column(
                       children: [
                         Text(
                           "Register Now",
-                          style: TextStyle(
+                          style: GoogleFonts.libreFranklin(
+                            fontWeight: FontWeight.w900,
                             fontSize: 15,
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         )
                       ],
                     ),
                     //------------------------------------------------------------------- textformfield start ------------------------------------------------------------------
                     TextFormField(
-                      controller: usernameController,
-                      onChanged: (userInput) {
-                        if (userInput.isNotEmpty) {
-                          setState(() {
-                            _showSuffixIconUsername = true;
-                          });
-                        } else {
-                          setState(() {
-                            _showSuffixIconUsername = false;
-                          });
-                        }
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Username',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(25.0),
+                        controller: usernameController,
+                        onChanged: (userInput) {
+                          if (userInput.isNotEmpty) {
+                            setState(() {
+                              //_showSuffixIconUsername = true;
+                            });
+                          } else {
+                            setState(() {
+                              //_showSuffixIconUsername = false;
+                            });
+                          }
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Username',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25.0),
+                          ),
+                          hintText: 'Enter your username',
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
+                          hintStyle: const TextStyle(
+                            color: Colors.grey, // change the color to grey
+                            fontSize: 15,
+                          ),
+                          prefixIcon: const Icon(Icons.person),
                         ),
-                        hintText: 'Enter your username',
-                        floatingLabelBehavior: FloatingLabelBehavior.never,
-                        hintStyle: const TextStyle(
-                          color: Colors.grey, // change the color to grey
-                          fontSize: 15,
-                        ),
-                        prefixIcon: const Icon(Icons.person),
-                        suffixIcon: _showSuffixIconUsername
-                            ? IconButton(
-                                icon: const Icon(Icons.close),
-                                onPressed: () {
-                                  usernameController
-                                      .clear(); // Clear the controller
-                                  setState(() {
-                                    _showSuffixIconUsername = false;
-                                  }); // Update the UI
-                                  if (kDebugMode) {
-                                    print('Username clear button pressed');
-                                  }
-                                },
-                              )
-                            : null,
-                      ),
-                      validator: (username) {
-                        if (username == null || username.isEmpty) {
-                          return 'Username is required.';
-                        }
-                        return null;
-                      },
-                      onSaved: (username) => _username = username ?? '',
-                    ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Username is required.';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          username = value ?? '';
+                        }),
                     //------------------------------------------------------------------- textformfield end -------------------------------------------------------------------
                     const SizedBox(height: 10),
                     //------------------------------------------------------------------- textformfield start ------------------------------------------------------------------
@@ -291,11 +253,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       onChanged: (email) {
                         if (email.isNotEmpty) {
                           setState(() {
-                            _showSuffixIconEmail = true;
+                            // _showSuffixIconEmail = true;
                           });
                         } else {
                           setState(() {
-                            _showSuffixIconEmail = false;
+                            // _showSuffixIconEmail = false;
                           });
                         }
                       },
@@ -311,33 +273,18 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           fontSize: 15,
                         ),
                         prefixIcon: const Icon(Icons.email),
-                        suffixIcon: _showSuffixIconEmail
-                            ? IconButton(
-                                icon: const Icon(Icons.close),
-                                onPressed: () {
-                                  emailController
-                                      .clear(); // Clear the controller
-                                  setState(() {
-                                    _showSuffixIconEmail = false;
-                                  }); // Update the UI
-                                  if (kDebugMode) {
-                                    print('Email clear button pressed');
-                                  }
-                                },
-                              )
-                            : null,
                       ),
-                      validator: (email) {
-                        if (email == null || email.isEmpty) {
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
                           return 'Email is required.';
                         }
 
-                        if (!emailRegExp.hasMatch(email)) {
+                        if (!emailRegExp.hasMatch(value)) {
                           return 'Please enter a valid email address';
                         }
                         return null;
                       },
-                      onSaved: (email) => _email = email ?? '',
+                      onSaved: (value) => email = value ?? '',
                       //maxLength: 50,
                     ),
                     //------------------------------------------------------------------- textformfield end -------------------------------------------------------------------
@@ -382,13 +329,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           });
                         }
                       },
-                      validator: (password) {
-                        if (password!.isEmpty) {
+                      validator: (value) {
+                        if (value!.isEmpty) {
                           return 'Password is required.';
                         }
                         return null;
                       },
-                      onSaved: (password) => _password = password!,
+                     onSaved: (value) => password = value ?? '',
                     ),
                     //------------------------------------------------------------------- textformfield end -------------------------------------------------------------------
                     const SizedBox(height: 10),
@@ -433,14 +380,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           });
                         }
                       },
-                      validator: (confirmPassword) {
-                        if (confirmPassword!.isEmpty) {
+                      validator: (value) {
+                        if (value!.isEmpty) {
                           return 'Confirm password is required.';
                         }
                         return null;
                       },
-                      onSaved: (confirmPassword) =>
-                          _confirmPassword = confirmPassword!,
+                    onSaved: (value) => confirmPassword = value ?? '',
                     ),
                     //------------------------------------------------------------------- textformfield end -------------------------------------------------------------------
                     const SizedBox(height: 20),
@@ -455,12 +401,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             _formKey.currentState?.save();
                             if (kDebugMode) {
                               print(
-                                'Username: $_username, Email: $_email, Password: $_password, Confirm password: $_confirmPassword',
+                                'Username:$username, Email: $email, Password: $password, Confirm password: $confirmPassword',
                               );
                             }
                             // Call this method in your widget's context
                             //_registerAndNavigate(context);
-                            signUp();
+                            signUp(username, email, password);
                           }
                         },
                         child: const Text(

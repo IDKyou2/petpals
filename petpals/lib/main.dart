@@ -1,15 +1,10 @@
 //import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:petpals/auth/login_or_register.dart';
-//import 'package:petpals/auth/login_or_register.dart';
-//import 'package:petpals/auth/login_or_register.dart';
-
-//import 'package:petpals/firebase_options.dart';
-//import 'package:petpals/users/login_page.dart';
-//import 'package:petpals/users/registration_page.dart';
+import 'package:petpals/users/home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
+  // Ensures that all Flutter binding is properly initialized
   WidgetsFlutterBinding.ensureInitialized();
   /*
   await Firebase.initializeApp(
@@ -25,20 +20,68 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
-
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: '',
-      home: Scaffold(
-        body: LoginOrRegisterPage(), // Add the LoginForm here
+      title: 'Petpals',
+      theme: lightTheme, // Set the light theme here
+      darkTheme: darkTheme, // Set the dark theme here
+      themeMode:
+          ThemeMode.system, // Switch based on system settings (light/dark mode)
+      home: const Scaffold(
+        body: HomePage(), // Add the LoginForm here
       ),
     );
   }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Define light and dark themes here
+final ThemeData lightTheme = ThemeData(
+  brightness: Brightness.light,
+  primaryColor: Colors.blue,
+  appBarTheme: const AppBarTheme(
+    backgroundColor: Colors.blue,
+    foregroundColor: Colors.white, // AppBar text color
+  ),
+  textTheme: const TextTheme(
+    bodyLarge: TextStyle(
+      color: Colors.black,
+    ),
+  ),
+  scaffoldBackgroundColor: Colors.white,
+);
+
+final ThemeData darkTheme = ThemeData(
+  brightness: Brightness.dark,
+  primaryColor: Colors.blueGrey,
+  appBarTheme: const AppBarTheme(
+    backgroundColor: Colors.black,
+    foregroundColor: Colors.white, // AppBar text color
+  ),
+  textTheme: const TextTheme(
+    bodyLarge: TextStyle(color: Colors.white),
+  ),
+  scaffoldBackgroundColor: Colors.black,
+);
