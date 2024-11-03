@@ -1,10 +1,8 @@
-//import 'dart:async';
-//import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:petpals/users/home_page.dart';
-//import 'package:petpals/users/home_page.dart';
 import 'package:petpals/users/registration_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -28,16 +26,22 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  final FocusNode emailFocusNode = FocusNode();
+  final FocusNode passwordFocusNode = FocusNode();
+
   bool _obscurePassword = true;
   bool _showSuffixIcon = false;
   bool _showSuffixIconPassword = false;
 
-  void toggleCheckbox(bool? value) {
-    setState(() {});
+  @override
+  void dispose() {
+    usernameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 
-/*
-  void _showErrorDialog(BuildContext context, String message) {
+  void showErrorDialog(BuildContext context, String message) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -45,7 +49,7 @@ class _LoginPageState extends State<LoginPage> {
           borderRadius: BorderRadius.circular(15),
         ),
         title: const Text(
-          "Oops! Something went wrong",
+          "Oops! there's an error",
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -81,15 +85,17 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-*/
 
-  // reload page
-  void reloadPage(BuildContext context, Widget page) {
-    Navigator.pop(context); // Remove the current page
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => page), // Push the same page again
-    );
+  void toggleCheckbox(bool? value) {
+    setState(() {});
+  }
+
+  bool isValidEmail(String email) {
+    // Regular expression for validating an email address
+    String emailPattern = r'^[a-zA-Z0-9._]+@[a-zA-Z0-9]+\.[a-zA-Z]+';
+    RegExp regExp = RegExp(emailPattern);
+
+    return regExp.hasMatch(email);
   }
 
   Future<void> loginUser() async {
@@ -110,6 +116,21 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     } on AuthException catch (e) {
+      // Handle the invalid credentials case
+      if (e.message.toLowerCase().contains('invalid login credentials')) {
+        showErrorDialog(context, "Invalid email or password.");
+        /*
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('You have entered invalid email or password.')),
+        );
+        */
+      } else {
+        // Handle other possible exceptions
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message)),
+        );
+      }
       if (kDebugMode) {
         print(e);
       }
@@ -227,6 +248,10 @@ class _LoginPageState extends State<LoginPage> {
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(); // Close the dialog
+                    setState(() {
+                      emailController.clear();
+                      passwordController.clear();
+                    });
                   },
                   child: const Text('Cancel'),
                 ),
@@ -256,7 +281,6 @@ class _LoginPageState extends State<LoginPage> {
       },
     );
   }
-
   //<------------------------------------------------------------ FOR TERMS AND CONDITIONS END ------------------------------------------------------------>
 
   @override
@@ -291,8 +315,10 @@ class _LoginPageState extends State<LoginPage> {
                         )
                       ],
                     ),
-
+                    // Email textformfield
                     TextFormField(
+                      autofocus: true,
+                      focusNode: emailFocusNode,
                       controller: emailController,
                       onChanged: (emailInput) {
                         setState(() {
@@ -326,19 +352,21 @@ class _LoginPageState extends State<LoginPage> {
                               )
                             : null,
                       ),
-                      validator: (email) {
-                        if (email == null || email.isEmpty) {
-                          return 'Email is required.';
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Email is required';
+                        } else if (!isValidEmail(value)) {
+                          return 'Please enter a valid email';
                         }
                         return null;
                       },
                       onSaved: (email) => email = email ?? '',
                     ),
 
-                    //------------------------------------------------------------------- textformfield end -------------------------------------------------------------------
                     const SizedBox(height: 10),
-                    //------------------------------------------------------------------- textformfield start -------------------------------------------------------------------
+                    //------------------------------------------------------------------- password textformfield -------------------------------------------------------------------
                     TextFormField(
+                      focusNode: passwordFocusNode,
                       obscureText: _obscurePassword,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -385,7 +413,7 @@ class _LoginPageState extends State<LoginPage> {
                       },
                       onSaved: (password) => password = password!,
                     ),
-                    //------------------------------------------------------------------- textformfield end -------------------------------------------------------------------
+
                     const SizedBox(height: 10),
                     SizedBox(
                       height: 50,
@@ -393,16 +421,33 @@ class _LoginPageState extends State<LoginPage> {
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black),
-                        onPressed: () async {
+                        // ------- login button ------
+                        onPressed: () {
+                          // Validate the form
                           if (_formKey.currentState!.validate()) {
+                            // If the form is valid, save the inputs and proceed with login
                             _formKey.currentState?.save();
+
+                            if (kDebugMode) {
+                              print("Email: ${emailController.text}");
+                              print("Password: ${passwordController.text}");
+                            }
+                            loginUser();
+                          } else {
+                            // If the form is invalid, unfocus the current field and focus the first invalid field
+                            FocusScope.of(context).unfocus();
+
+                            if (emailController.text.isEmpty ||
+                                !isValidEmail(emailController.text)) {
+                              emailFocusNode
+                                  .requestFocus(); // Focus on the email field
+                            } else if (passwordController.text.isEmpty) {
+                              passwordFocusNode
+                                  .requestFocus(); // Focus on the password field
+                            }
                           }
-                          if (kDebugMode) {
-                            print(emailController.text);
-                            print(passwordController.text);
-                          }
-                          loginUser();
                         },
+
                         child: const Text(
                           'Login',
                           style: TextStyle(
