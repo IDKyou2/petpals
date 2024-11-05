@@ -217,7 +217,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
             // -------------------------------------------------------------------------- CARD --------------------------------------------------------------------------
             SizedBox(
               width: 350,
-              height: 500,
+              //height: 400,
               child: Card(
                 clipBehavior: Clip.hardEdge,
                 child: InkWell(

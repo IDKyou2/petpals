@@ -9,7 +9,9 @@ import 'package:petpals/users/pet_profile_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({
+    super.key,
+  });
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -17,6 +19,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final supabase = Supabase.instance.client;
+  final session = Supabase.instance.client.auth.currentSession;
 
   final _searchController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -25,22 +28,54 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 2, vsync: this); // 2 tabs
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose(); // Dispose of the controller
+    super.dispose();
+  }
+
+  void navigateToTab(int index) {
+    _tabController.index = index; // Change the tab index
   }
 
   Future<void> logOut() async {
-    await supabase.auth.signOut();
-    if (!mounted) return;
-    Navigator.pushReplacement(
+    try {
+      // Sign out the user with Supabase
+      await supabase.auth.signOut();
+
+      // Ensure the widget is still mounted before navigating or showing a message
+      if (!mounted) return;
+
+      // Navigate to the Login page
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => const LoginPage(),
-        ));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Logged out successfully.'),
-      ),
-    );
+        ),
+      );
+
+      // Show logout confirmation message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Logged out successfully.'),
+        ),
+      );
+    } catch (error) {
+      // Handle any errors during logout
+      if (kDebugMode) {
+        print('Logout error: $error');
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error logging out: $error'),
+          ),
+        );
+      }
+    }
   }
 
   // <------------------------------------------- FUNCTION FOR NAVIGATING PAGES -------------------------------------->
@@ -60,6 +95,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    // Provider.of<AuthProvider>(context); // For session
+    //final user = authProvider.user; // Get user details
+
     return Scaffold(
         key: _scaffoldKey, // Assign the key to the Scaffold
         appBar: AppBar(
@@ -108,7 +146,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               borderSide: BorderSide(color: Colors.black, width: 2.0),
             ),
             controller: _tabController,
-
             tabs: <Widget>[
               Container(
                 color: Colors.transparent,
@@ -186,6 +223,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             SingleChildScrollView(
               child: Column(
                 children: [
+                  /*
+                  Text(
+                    // Get user details
+                    session != null
+                        ? 'User logged in as: ${session?.user.email}'
+                        : 'No active session found or account not logged in yet.',
+                  ),
+                  */
+
                   Padding(
                     padding: const EdgeInsets.only(top: 10.0, bottom: 15.0),
                     child: SizedBox(
@@ -620,10 +666,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ],
               ),
             ),
-            //--------------------------------------------------------------------------- FOUND TAB -----------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------- FOUND TAB -----------------------------------------------------------------------
             SingleChildScrollView(
               child: Column(
                 children: [
+                  Text(
+                    // Get user details
+                    session != null
+                        ? 'User logged in as: ${session?.user.email}'
+                        : 'No active session found or account not logged in yet.',
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(top: 10.0, bottom: 15.0),
                     child: SizedBox(
@@ -1089,48 +1141,62 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
         //---------------------------------------------------------------------- BOTTOM APPBAR -------------------------------------------------------------
         bottomNavigationBar: BottomAppBar(
+          color: Colors.transparent,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              IconButton(
-                icon: const FaIcon(FontAwesomeIcons.house),
-                onPressed: () {
-                  _navigateToAnotherPage(
-                    context,
-                    const HomePage(),
-                    /*
-                    onReturn: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('You returned from HomePage')),
-                      );
-                    },
-                    */
-                  );
-                },
+              // Home Button
+              Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.transparent, // Background color for the circle
+                ),
+                padding: const EdgeInsets.all(
+                    8.0), // Padding to increase circle size
+                child: IconButton(
+                  icon: const FaIcon(FontAwesomeIcons.house),
+                  onPressed: () {
+                    _navigateToAnotherPage(
+                      context,
+                      const HomePage(),
+                    );
+                  },
+                ),
               ),
-              IconButton(
-                icon: const FaIcon(FontAwesomeIcons.message),
-                onPressed: () {
-                  _navigateToAnotherPage(
-                    context,
-                    const MessagePage(),
-                    /*
-                    onReturn: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('You returned from MessagePage')),
-                      );
-                    },
-                    */
-                  );
-                },
+              // Message Button
+              Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.transparent,
+                ),
+                padding: const EdgeInsets.all(8.0),
+                child: IconButton(
+                  icon: const FaIcon(FontAwesomeIcons.message),
+                  onPressed: () {
+                    _navigateToAnotherPage(
+                      context,
+                      const MessagePage(),
+                    );
+                  },
+                ),
               ),
-              IconButton(
+              // Notifications Button
+              Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.transparent
+                ),
+                padding: const EdgeInsets.all(8.0),
+                child: IconButton(
                   icon: const FaIcon(FontAwesomeIcons.bell),
                   onPressed: () {
-                    _navigateToAnotherPage(context, const NotificationsPage());
-                  }),
+                    _navigateToAnotherPage(
+                      context,
+                      const NotificationsPage(),
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         ));
