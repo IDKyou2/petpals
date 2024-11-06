@@ -15,8 +15,7 @@ class Features extends StatelessWidget {
   }
   */
 
-
-   // reload page
+  // reload page
   void reloadPage(BuildContext context, Widget page) {
     Navigator.pop(context); // Remove the current page
     Navigator.push(
@@ -24,7 +23,6 @@ class Features extends StatelessWidget {
       MaterialPageRoute(builder: (context) => page), // Push the same page again
     );
   }
-
 
   void _showErrorDialog(BuildContext context, String message) {
     showDialog(
@@ -71,7 +69,6 @@ class Features extends StatelessWidget {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,6 +113,13 @@ class Features extends StatelessWidget {
               ),
             ),
             // <------------------------------------------- CUSTOMIZED BACK ARROW BUTTON END ------------------------------------------->
+            // Line divider
+            const Divider(
+              color: Colors.grey, // Color of the line
+              thickness: 2.0, // Thickness of the line
+              indent: 20.0, // Start padding
+              endIndent: 20.0, // End padding
+            ),
           ],
         ),
       ),

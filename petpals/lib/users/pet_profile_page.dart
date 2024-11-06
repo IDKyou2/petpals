@@ -108,13 +108,11 @@ class _PetProfilePageState extends State<PetProfilePage> {
           children: [
             // <-------------------------------------------------- BLACK LINE --------------------------------------->
             Container(
-              height: 40,
+              height: 20,
               color: Colors.black,
               width: double.infinity,
             ),
-            const SizedBox(
-              height: 20,
-            ),
+
             // <-------------------------------------------------- BLACK LINE END --------------------------------------->
             const SizedBox(
               height: 10,
@@ -145,11 +143,11 @@ class _PetProfilePageState extends State<PetProfilePage> {
                               50), // Ripple effect adapts to borderRadius
                           child: const Padding(
                             padding: EdgeInsets.all(
-                                8.0), // Optional padding for better sizing
+                                8.0),   // Optional padding for better sizing
                             child: Icon(
                               Icons.arrow_back_ios_new_rounded,
                               color: Colors.white, // Icon color
-                              size: 35,
+                              size: 30,
                             ),
                           ),
                         ),
@@ -188,7 +186,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                   ),
                 ),
                 // <--------------------------------------------------------- PROFILE PICTURE END ----------------------------------------------------------------->
-                 const SizedBox(
+                const SizedBox(
                   width: 5,
                 ),
                 const Text(
@@ -237,14 +235,14 @@ class _PetProfilePageState extends State<PetProfilePage> {
                         decoration: const BoxDecoration(
                           image: DecorationImage(
                             image: AssetImage(
-                                'images/insert_image.png'), // Replace with your image
+                                'images/german_shepherd.webp'), // Replace with your image
                             fit: BoxFit.cover,
                           ),
                         ),
                       ),
                       // Lower portion for the name and label
-                      const Padding(
-                        padding: EdgeInsets.all(10.0),
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
                         child: SizedBox(
                           width: 300,
                           child: Column(
@@ -254,94 +252,161 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    'Name',
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    '(time posted)',
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.grey),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Breed:',
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.grey),
-                                  ),
-                                  Text(
-                                    '(Havanese)',
-                                    style: TextStyle(
-                                      color: Colors.blue, // Set the text color
-                                      fontSize: 13, // Set the text font size
-                                      fontWeight: FontWeight
-                                          .bold, // Set the text font weight
+                                  Container(
+                                    padding: const EdgeInsets.all(6.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.lightBlue.shade700,
+                                      borderRadius: BorderRadius.circular(20.0),
                                     ),
-                                  )
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Gender',
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.grey),
-                                  ),
-                                  Text(
-                                    '(Male)',
-                                    style: TextStyle(
-                                      color: Colors.blue, // Set the text color
-                                      fontSize: 13, // Set the text font size
-                                      fontWeight: FontWeight
-                                          .bold, // Set the text font weight
+                                    child: const Text(
+                                      'Name',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
                                     ),
-                                  )
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.all(6.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey,
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    child: const Text(
+                                      'Time posted',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
                                 ],
                               ),
+                              const SizedBox(
+                                height: 2.0,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(6.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.lightBlue.shade700,
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    child: const Text(
+                                      'Breed',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.all(6.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.brown.shade700,
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    child: const Text(
+                                      'Color',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.all(6.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.lightBlue.shade700,
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    child: const Text(
+                                      'Gender',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.all(6.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.lightBlue.shade700,
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    child: const Text(
+                                      'Age',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 2.0,
+                              ),
+                              const Divider(
+                                color: Colors.grey, // Color of the line
+                                thickness: 2.0, // Thickness of the line
+                                //indent: 10.0, // Start padding
+                                //endIndent: 10.0, // End padding
+                              ),
+                              const Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'Unique markings/features:',
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 2.0,
+                              ),
+                              // divider
+
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    'Age:',
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.grey),
+                                  Container(
+                                    padding: const EdgeInsets.all(6.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black87,
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    child: const Text(
+                                      'Last seen',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                   ),
-                                  Text(
-                                    '(5 years):',
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Last Seen:',
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.grey),
-                                  ),
-                                  Text(
-                                    '(Location seen):',
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.red,
-                                        fontWeight: FontWeight.bold),
+                                  Container(
+                                    padding: const EdgeInsets.all(6.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red.shade600,
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    child: const Text(
+                                      'Deca Homes Cabantian',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -355,7 +420,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
               ),
             ),
             const SizedBox(
-              height: 20,
+              height: 10,
             ),
             SizedBox(
               width: 300,
@@ -363,11 +428,17 @@ class _PetProfilePageState extends State<PetProfilePage> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.white,
-                  backgroundColor: Colors.black, // Change text color to white
+                  backgroundColor:
+                      Colors.blue.shade700, // Change text color to white
                 ),
                 onPressed: () {
                   debugPrint('Report as lost tapped.');
-                  _navigateToAnotherPage(context, const HomePage());
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HomePage(),
+                    ),
+                  );
                 },
                 child: const Text(
                   'Report as lost',

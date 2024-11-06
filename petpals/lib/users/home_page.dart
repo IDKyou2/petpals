@@ -274,6 +274,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       splashColor: Colors.blue.withAlpha(30),
                       onTap: () {
                         debugPrint('Card tapped.');
+                        
                       },
                       child: Column(
                         children: [
