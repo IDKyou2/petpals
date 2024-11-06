@@ -1,5 +1,6 @@
 //import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:petpals/users/home_page.dart';
 import 'package:petpals/users/pet_profile_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
       themeMode:
           ThemeMode.system, // Switch based on system settings (light/dark mode)
       home: const Scaffold(
-        body: PetProfilePage(), // Add the LoginForm here
+        body: HomePage(), // Add the LoginForm here
       ),
     );
   }

@@ -143,7 +143,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                               50), // Ripple effect adapts to borderRadius
                           child: const Padding(
                             padding: EdgeInsets.all(
-                                8.0),   // Optional padding for better sizing
+                                8.0), // Optional padding for better sizing
                             child: Icon(
                               Icons.arrow_back_ios_new_rounded,
                               color: Colors.white, // Icon color
@@ -269,6 +269,21 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                   Container(
                                     padding: const EdgeInsets.all(6.0),
                                     decoration: BoxDecoration(
+                                      color: Colors.black87,
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    child: const Text(
+                                      'Breed',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  /*
+                                  Container(
+                                    padding: const EdgeInsets.all(6.0),
+                                    decoration: BoxDecoration(
                                       color: Colors.grey,
                                       borderRadius: BorderRadius.circular(20.0),
                                     ),
@@ -280,6 +295,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                           fontWeight: FontWeight.bold),
                                     ),
                                   ),
+                                  */
                                 ],
                               ),
                               const SizedBox(
@@ -288,20 +304,6 @@ class _PetProfilePageState extends State<PetProfilePage> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(6.0),
-                                    decoration: BoxDecoration(
-                                      color: Colors.lightBlue.shade700,
-                                      borderRadius: BorderRadius.circular(20.0),
-                                    ),
-                                    child: const Text(
-                                      'Breed',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
                                   Container(
                                     padding: const EdgeInsets.all(6.0),
                                     decoration: BoxDecoration(
@@ -338,6 +340,20 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                     ),
                                     child: const Text(
                                       'Age',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.all(6.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.lightBlue.shade700,
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    child: const Text(
+                                      'Size',
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 15,
