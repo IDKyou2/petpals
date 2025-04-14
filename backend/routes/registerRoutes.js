@@ -25,7 +25,7 @@ router.post("/register", async (req, res) => {
   if (password !== confirmPassword) {
     return res
       .status(400)
-      .json({ message: "Passwords don't match!" });
+      .json({ message: "Password and Confirm password don't match!" });
   }
 
   try {
@@ -86,11 +86,12 @@ router.post("/register", async (req, res) => {
     });
 
     const savedUser = await newUser.save();
+    //-------------------------------------------------- account created message ----------------------------//
     res.status(201).json({ message: "Account Created!" });
   } catch (error) {
     console.error("Error saving user:", error);
     if (error.code === 11000) {
-      return res.status(400).json({ message: "That user already exists!" });
+      return res.status(400).json({ message: "User already exists!" });
     }
     res.status(500).json({ message: "Server error" });
   }

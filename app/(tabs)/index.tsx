@@ -1,3 +1,5 @@
+// -------------------------------------------- Page navigations and names --------------------------------------------//
+
 import React, { useState, useEffect } from "react";
 import { View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -169,6 +171,7 @@ const App = () => {
   };
 
   const navigateToMatchedPage = () => {
+    // -------------------------------------------- Matched page --------------------------------------------//
     setCurrentScreen("LostAndFoundDogMatched");
     setFormData(null);
     setSelectedDog(null);

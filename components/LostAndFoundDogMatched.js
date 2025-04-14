@@ -638,6 +638,7 @@ const LostAndFoundDogMatched = ({
     }
   };
 
+  // ---------------------------------------- Save Button ----------------------------------------
   const handleSaveChanges = async (dog) => {
     setIsLoading(true);
     try {
@@ -870,11 +871,8 @@ const LostAndFoundDogMatched = ({
                       {dog.breed}, {dog.gender}
                     </Text>
                   )}
+                  {/* --------------------------- Last seen location ------------------------------- */}
                   <View style={styles.cardLocation}>
-                    <Image
-                      source={require("../assets/images/location-icon.png")}
-                      style={styles.locationIcon}
-                    />
                     {isEditing ? (
                       <TextInput
                         style={styles.editInput}
@@ -889,8 +887,14 @@ const LostAndFoundDogMatched = ({
                         {dog.category === "Found" ? "Found at:" : "Last seen:"}{" "}
                         {dog.location} 🐶
                       </Text>
-                    )}
+                    )
+                    }
+                    <Image
+                      source={require("../assets/images/location-icon.png")}
+                      style={styles.locationIcon}
+                    />
                   </View>
+
                   <Text style={styles.cardTimestamp}>
                     {dog.category === "Found" ? "Found on:" : "Lost on:"}{" "}
                     {new Date(dog.createdAt).toLocaleString()}
@@ -919,6 +923,7 @@ const LostAndFoundDogMatched = ({
                   <View style={styles.buttonContainer}>
                     {isEditing ? (
                       <>
+                        {/* ---------------------------------------- Save and Cancel buttons -----------------------------*/}
                         <TouchableOpacity
                           style={styles.saveButton}
                           onPress={() => handleSaveChanges(dog)}
@@ -941,6 +946,7 @@ const LostAndFoundDogMatched = ({
                     ) : (
                       <>
                         {dog.userId?._id === currentUserId && (
+                          /* ---------------------------------------- Edit button -----------------------------*/
                           <TouchableOpacity
                             style={styles.editButton}
                             onPress={() => handleEditClick(dog)}
@@ -1304,8 +1310,10 @@ const styles = StyleSheet.create({
     textTransform: "capitalize"
   },
   cardSubtitle: { fontSize: 16, color: "#666", marginBottom: 5, textTransform: "capitalize" },
+
   cardLocation: { flexDirection: "row", alignItems: "center", marginBottom: 5 },
-  locationIcon: { width: 16, height: 16, marginRight: 5, tintColor: "#666" },
+
+  locationIcon: { width: 16, marginRight: 5, height: 16, tintColor: "#666" },
   cardLocationText: { fontSize: 14, color: "#666", flexShrink: 1 },
   cardTimestamp: { fontSize: 12, color: "#666", marginBottom: 5 },
   cardCategory: {
@@ -1332,14 +1340,20 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   moreInfoText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+
+  //-------------- Edit button --------------//
   editButton: {
-    backgroundColor: "#664229",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
     marginVertical: 5,
+    borderColor: "#664229",
+    backgroundColor: "#fff",
+    borderWidth: 2,
   },
-  editButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+
+  editButtonText: { color: "#0", fontSize: 16, fontWeight: "bold" },
+
   saveButton: {
     backgroundColor: "#664229",
     paddingVertical: 10,
@@ -1348,14 +1362,18 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   saveButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+
   cancelButton: {
-    backgroundColor: "#664229",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
     marginVertical: 5,
+    backgroundColor: "#fff",
+    borderWidth: 2,
+    borderColor: "#664229",
   },
-  cancelButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  cancelButtonText: { color: "#0", fontSize: 16, fontWeight: "bold" },
+
   editInput: {
     backgroundColor: "#fff",
     borderWidth: 1,

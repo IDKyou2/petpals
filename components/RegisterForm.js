@@ -158,7 +158,7 @@ const RegisterForm = ({ onLoginClick }) => {
           },
         }
       );
-      setSuccess(`${data.message} Redirecting to login after 3 seconds...`);
+      setSuccess(`${data.message} Redirecting to login...`);
       setTimeout(() => onLoginClick(), 3000);
     } catch (err) {
       console.log("Axios error:", err);

@@ -1,3 +1,5 @@
+//  ------------------------------------------------------------ After LostDogForm.js -------------------------------------------------------
+
 import React, { useState, useEffect, useRef } from "react";
 import {
   View,
@@ -15,6 +17,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import useChatCount from "./hooks/useChatCount";
 import NotificationModal from "./NotificationModal";
+
 
 const ViewLostDogFormAfter = ({
   onNavigateToHome,
@@ -38,7 +41,7 @@ const ViewLostDogFormAfter = ({
   const [editBreed, setEditBreed] = useState(formData?.breed || "Havanese");
   const [editSize, setEditSize] = useState(formData?.size || "Small");
   const [editDetails, setEditDetails] = useState(
-    formData?.details || "No further description."
+    formData?.details || "No additional details provided."
   );
   const [editGender, setEditGender] = useState(formData?.gender || "Male");
   const [editLocation, setEditLocation] = useState(
@@ -183,7 +186,7 @@ const ViewLostDogFormAfter = ({
       );
 
       console.log("Server Response:", data);
-
+      
       if (onNavigateToLostDogPage && onNavigateToMatchedPage) {
         onNavigateToLostDogPage();
         onNavigateToMatchedPage();
@@ -206,6 +209,8 @@ const ViewLostDogFormAfter = ({
   const handleCancelReport = () => {
     setModalVisible(false);
   };
+
+
 
   return (
     <View style={styles.container}>
@@ -388,7 +393,7 @@ const ViewLostDogFormAfter = ({
                 style={[styles.input, styles.detailsInput]}
                 value={editDetails}
                 onChangeText={setEditDetails}
-                placeholder="Details"
+                placeholder="Additional details."
                 placeholderTextColor="#999"
                 multiline
                 numberOfLines={3}
@@ -416,7 +421,7 @@ const ViewLostDogFormAfter = ({
               </View>
             )}
           </View>
-
+          {/* ------------------------------------  Edit button ---------------------------------*/}
           {!isEditing && (
             <TouchableOpacity
               style={styles.editButton}
@@ -446,6 +451,7 @@ const ViewLostDogFormAfter = ({
         animationType="fade"
         onRequestClose={() => !isSubmitting && setModalVisible(false)}
       >
+        {/* --------------------------------------------- Modal ---------------------------------------- */}
         <View style={styles.modalOverlay}>
           <View style={styles.confirmationModal}>
             <Text style={styles.modalText}>Do you want to report this?</Text>
@@ -470,7 +476,7 @@ const ViewLostDogFormAfter = ({
                 onPress={handleCancelReport}
                 disabled={isSubmitting}
               >
-                <Text style={styles.buttonText}>NO</Text>
+                <Text style={styles.noButtonText}>NO</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -572,17 +578,25 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 1,
   },
+  //-------------- No button --------------//
+  // brown border, white background //
   noButton: {
-    backgroundColor: "#664229",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
+    borderWidth: 2,
+    borderColor: "#664229",
+    backgroundColor: "#fff",
   },
+
+  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  noButtonText: { color: "#0", fontSize: 16, fontWeight: "bold" },
+
   disabledButton: {
     backgroundColor: "#cccccc",
     opacity: 0.6,
   },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+
   menuItem: {
     paddingVertical: 15,
     borderBottomWidth: 1,
@@ -650,7 +664,11 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     alignSelf: "center",
   },
-  dogDetails: { marginBottom: 15, flexDirection: "column" },
+  dogDetails: {
+    marginBottom: 15, flexDirection: "column",
+    //-------------- Capitalize first letter -----------//
+    textTransform: "capitalize",
+  },
   dogName: {
     fontSize: 18,
     fontWeight: "bold",
@@ -727,24 +745,31 @@ const styles = StyleSheet.create({
     color: "#000",
     fontWeight: "bold",
   },
+  //-------------- Edit button --------------//
   editButton: {
-    backgroundColor: "#664229",
     paddingVertical: 8,
     paddingHorizontal: 15,
     borderRadius: 5,
     marginBottom: 15,
     alignSelf: "flex-end",
+    borderColor: "#664229",
+    backgroundColor: "#fff",
+    borderWidth: 2,
   },
-  editButtonText: { fontSize: 14, color: "#fff", fontWeight: "bold" },
+  editButtonText: { fontSize: 14, color: "#0", fontWeight: "bold" },
+
+  //  ------------ Save changes button --------------//
   saveButton: {
-    backgroundColor: "#664229",
     paddingVertical: 8,
     paddingHorizontal: 15,
     borderRadius: 5,
     marginBottom: 15,
     alignSelf: "flex-end",
+    borderColor: "#664229",
+    backgroundColor: "#fff",
+    borderWidth: 2,
   },
-  saveButtonText: { fontSize: 14, color: "#fff", fontWeight: "bold" },
+  saveButtonText: { fontSize: 14, color: "#0", fontWeight: "bold" },
   reportButton: {
     backgroundColor: "#664229",
     paddingVertical: 12,

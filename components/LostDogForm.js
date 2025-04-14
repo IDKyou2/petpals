@@ -139,23 +139,23 @@ const LostDogForm = ({
     setImageError("");
 
     if (!dogName) {
-      setNameError("Please enter the dog's name!");
+      setNameError("Please enter dog's name!");
       return;
     }
     if (!dogBreed) {
-      setBreedError("Please enter the dog's breed!");
+      setBreedError("Please enter dog's breed!");
       return;
     }
     if (!dogSize) {
-      setSizeError("Please enter the dog's size!");
+      setSizeError("Please enter dog's size!");
       return;
     }
     if (!gender) {
-      setGenderError("Please select a gender!");
+      setGenderError("Please select dog's gender!");
       return;
     }
     if (!location) {
-      setLocationError("Please enter the location!");
+      setLocationError("Please enter last seen location!");
       return;
     }
     if (!selectedImage) {
@@ -236,6 +236,8 @@ const LostDogForm = ({
       setImageError("");
     }
   };
+
+
 
   return (
     <View style={styles.container}>
@@ -319,10 +321,10 @@ const LostDogForm = ({
           ) : null}
         </View>
 
-        <Text style={styles.label}>Name of dog:</Text>
+        <Text style={styles.label}>Name:</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter dog's name"
+          placeholder="Enter dog's name."
           value={dogName}
           onChangeText={(text) => {
             setDogName(text);
@@ -331,10 +333,10 @@ const LostDogForm = ({
         />
         {nameError ? <Text style={styles.errorText}>{nameError}</Text> : null}
 
-        <Text style={styles.label}>Breed of dog:</Text>
+        <Text style={styles.label}>Breed:</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter dog's breed"
+          placeholder="Enter dog's breed."
           value={dogBreed}
           onChangeText={(text) => {
             setDogBreed(text);
@@ -343,7 +345,7 @@ const LostDogForm = ({
         />
         {breedError ? <Text style={styles.errorText}>{breedError}</Text> : null}
 
-        <Text style={styles.label}>Size of dog:</Text>
+        <Text style={styles.label}>Size:</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter dog's size (Ex. small, medium, huge)"
@@ -355,10 +357,10 @@ const LostDogForm = ({
         />
         {sizeError ? <Text style={styles.errorText}>{sizeError}</Text> : null}
 
-        <Text style={styles.label}>Optional / other details:</Text>
+        <Text style={styles.label}>Additional details: (*Optional*)</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter other details (optional)"
+          placeholder="Enter additional details."
           value={otherDetails}
           onChangeText={setOtherDetails}
           multiline
@@ -418,7 +420,8 @@ const LostDogForm = ({
           <Text style={styles.errorText}>{genderError}</Text>
         ) : null}
 
-        <Text style={styles.label}>Location:</Text>
+        {/* ----------------------------------------------- Location input with suggestions --------------------------------------------*/}
+        <Text style={styles.label}>Last seen location:</Text>
         <View style={styles.locationInputContainer}>
           <Image
             source={require("../assets/images/location-icon.png")}
@@ -426,7 +429,7 @@ const LostDogForm = ({
           />
           <TextInput
             style={styles.locationInput}
-            placeholder="Enter location"
+            placeholder="Enter your dog's last seen location."
             value={location}
             onChangeText={handleLocationChange}
           />
@@ -451,7 +454,7 @@ const LostDogForm = ({
             />
           </View>
         )}
-
+        {/* ----------------------------------------------- Submit button --------------------------------------------*/}
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText}>SUBMIT</Text>
         </TouchableOpacity>

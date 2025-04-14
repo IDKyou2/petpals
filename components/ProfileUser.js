@@ -50,12 +50,12 @@ const ProfileUser = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
 
         if (userResponse.status === 200) {
           setUserData({
-            fullName: userResponse.data.fullName || "Juan Dela Cruz",
-            contact: userResponse.data.contact || "09106993468",
-            email: userResponse.data.email || "juan@example.com",
+            fullName: userResponse.data.fullName || "User",
+            contact: userResponse.data.contact || "09XXXXXXXXX",
+            email: userResponse.data.email || "user@gmail.com",
             profilePic: userResponse.data.profilePic || "/default-avatar.png",
           });
-          setNewContact(userResponse.data.contact || "09106993468");
+          setNewContact(userResponse.data.contact || "09XXXXXXXXX");
 
           const messagesResponse = await axios.get(
             `${SERVER_URL}/api/chat/private-messages/${userResponse.data.fullName}`,
@@ -150,12 +150,30 @@ const ProfileUser = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
   const handleMessageClick = () => onNavigateToChatForum?.();
   const handleNotificationClick = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-  const handleEditAccount = () => setIsEditing(true);
+
+  // ---------------- edit function ------------------//
+  const editInfo = () => setIsEditing(true);
+
+
+  // ---------------- Save changes button ------------------//
   const handleSaveChanges = () => {
     if (!newContact.trim()) return;
     setConfirmationModalVisible(true);
   };
-  const handleConfirmChange = async () => {
+
+  const VALID_PH_PREFIXES = [
+    "0905", "0906", "0907", "0908", "0909", "0910", "0911", "0912", "0913",
+    "0914", "0915", "0916", "0917", "0918", "0919", "0920", "0921", "0922",
+    "0923", "0924", "0925", "0926", "0927", "0928", "0929", "0930", "0935",
+    "0936", "0937", "0938", "0939", "0940", "0945", "0946", "0947", "0948",
+    "0949", "0950", "0951", "0953", "0954", "0955", "0956", "0965", "0966",
+    "0967", "0970", "0975", "0976", "0977", "0978", "0979", "0981", "0989",
+    "0991", "0992", "0993", "0994", "0995", "0996", "0997", "0998", "0999",
+    "0895", "0896", "0897", "0898"
+  ];
+
+  // ---------------- Confirm button ------------------//
+  const handleConfirmChanges = async () => {
     const token = await AsyncStorage.getItem("token");
     if (!token) return;
 
@@ -183,10 +201,11 @@ const ProfileUser = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
       console.error("Error updating user profile:", error);
     }
   };
-  const handleCancelChange = () => {
+
+  const handleCancelChanges = () => {
     setConfirmationModalVisible(false);
     setIsEditing(false);
-    setNewContact(userData?.contact || "09106993468");
+    setNewContact(userData?.contact || "09XXXXXXXXX");
   };
 
   return (
@@ -238,23 +257,25 @@ const ProfileUser = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
             style={styles.profileImage}
           />
           <Text style={styles.profileNameText}>
-            {userData?.fullName || "Juan Dela Cruz"}
+            {userData?.fullName || "User"}
           </Text>
           {isEditing ? (
             <View style={styles.editContainer}>
               <Text style={styles.nameText}>
-                {userData?.fullName || "Juan Dela Cruz"}
+                {userData?.fullName || "User"}
               </Text>
               <TextInput
                 style={styles.contactInput}
                 value={newContact}
                 onChangeText={(text) => {
+                  // Remove all non-numeric characters
                   const numericText = text.replace(/[^0-9]/g, "");
+
                   if (numericText.length <= 11) {
                     setNewContact(numericText);
                   }
                 }}
-                placeholder="Enter new contact number"
+                placeholder="Enter new contact number."
                 keyboardType="number-pad"
                 maxLength={11}
                 autoFocus
@@ -268,7 +289,7 @@ const ProfileUser = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.cancelButton}
-                  onPress={handleCancelChange}
+                  onPress={handleCancelChanges}
                 >
                   <Text style={styles.cancelButtonText}>Cancel</Text>
                 </TouchableOpacity>
@@ -283,8 +304,9 @@ const ProfileUser = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
                 Contact #: {userData?.contact || "09106993468"}
               </Text>
               <TouchableOpacity
+                //------------------------------ Edit button -------------------------//
+                onPress={editInfo}
                 style={styles.editButton}
-                onPress={handleEditAccount}
               >
                 <Text style={styles.editButtonText}>Edit Info</Text>
               </TouchableOpacity>
@@ -381,13 +403,15 @@ const ProfileUser = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
             <View style={styles.confirmationButtons}>
               <TouchableOpacity
                 style={styles.confirmButton}
-                onPress={handleConfirmChange}
+                onPress={handleConfirmChanges}
               >
                 <Text style={styles.confirmButtonText}>Yes</Text>
               </TouchableOpacity>
+              {/* ------------------------------ No button -------------------------// */}
               <TouchableOpacity
+                onPress={handleCancelChanges}
                 style={styles.cancelButton}
-                onPress={handleCancelChange}
+
               >
                 <Text style={styles.cancelButtonText}>No</Text>
               </TouchableOpacity>
@@ -510,6 +534,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     fontWeight: "bold",
   },
+  //-------------- Edit button style -------------------//
   editButton: {
     backgroundColor: "#664229",
     paddingVertical: 8,
@@ -533,14 +558,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  //-------------- No button -------------------
+  // brown border, white background //
   cancelButton: {
-    backgroundColor: "#664229",
     paddingVertical: 10,
     paddingHorizontal: 25,
     borderRadius: 8,
+    borderColor: "#664229",
+    backgroundColor: "#fff",
+    borderWidth: 2,
   },
   cancelButtonText: {
-    color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },
@@ -668,8 +696,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     width: "100%",
   },
+
   confirmButton: {
-    backgroundColor: "#28a745",
+    backgroundColor: "#664229",
     paddingVertical: 12,
     paddingHorizontal: 25,
     borderRadius: 8,
