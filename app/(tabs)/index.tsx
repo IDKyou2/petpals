@@ -20,7 +20,7 @@ import ChatForum from "../../components/ChatForum";
 import PrivateChat from "../../components/PrivateChat";
 import LostDogViewUserInfo from "../../components/LostDogViewUserInfo";
 import FoundDogViewUserInfo from "../../components/FoundDogViewUserInfo";
-import LostAndFoundViewMatchedUser from "../../components/LostAndFoundViewMatchedUser";
+import LostAndFoundViewMatchedUser from "../../components/MatchPageMoreInfo";
 import ViewLostAndFoundSuggestions from "../../components/ViewLostAndFoundSuggestions";
 import SuggestionsForm from "../../components/SuggestionsForm";
 import ProtectedRoute from "../../components/utils/ProtectedRoute";
