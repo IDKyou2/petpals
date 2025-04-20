@@ -15,13 +15,12 @@ import LostDogPage from "../../components/LostDogPage";
 import FoundDogForm from "../../components/FoundDogForm";
 import ViewFoundDogFormAfter from "../../components/ViewFoundDogFormAfter";
 import FoundDogPage from "../../components/FoundDogPage";
-import LostAndFoundDogMatched from "../../components/LostAndFoundDogMatched";
+import LostAndFoundDogMatched from "../../components/MatchPage";
 import ChatForum from "../../components/ChatForum";
 import PrivateChat from "../../components/PrivateChat";
 import LostDogViewUserInfo from "../../components/LostDogViewUserInfo";
 import FoundDogViewUserInfo from "../../components/FoundDogViewUserInfo";
 import LostAndFoundViewMatchedUser from "../../components/LostAndFoundViewMatchedUser";
-import LostAndFoundViewMatchedUserS from "../../components/LostAndFoundViewMatchedUserS";
 import ViewLostAndFoundSuggestions from "../../components/ViewLostAndFoundSuggestions";
 import SuggestionsForm from "../../components/SuggestionsForm";
 import ProtectedRoute from "../../components/utils/ProtectedRoute";
@@ -140,12 +139,6 @@ const App = () => {
     console.log("Setting currentScreen to LostAndFoundViewMatchedUser");
     setSelectedDog(dog);
     setCurrentScreen("LostAndFoundViewMatchedUser");
-  };
-
-  const navigateToLostAndFoundViewMatchedUserS = (dog: any) => {
-    console.log("Setting currentScreen to LostAndFoundViewMatchedUserS");
-    setSelectedDog(dog);
-    setCurrentScreen("LostAndFoundViewMatchedUserS");
   };
 
   const navigateToViewLostDogFormAfter = (data: FormData) => {
@@ -337,6 +330,7 @@ const App = () => {
             onNavigateToViewLostAndFoundSuggestions={navigateToViewLostAndFoundSuggestions}
           />
         ) : currentScreen === "LostAndFoundDogMatched" ? (
+          // -------------------------------------------- Matched page --------------------------------------------//
           <ProtectedRoute
             component={LostAndFoundDogMatched}
             onSignUpClick={handleSignUpClick}
@@ -349,7 +343,6 @@ const App = () => {
             onNavigateToChatForum={navigateToChatForum}
             onNavigateToLostDogViewUserInfo={navigateToLostDogViewUserInfo}
             onNavigateToLostAndFoundViewMatchedUser={navigateToLostAndFoundViewMatchedUser}
-            onNavigateToLostAndFoundViewMatchedUserS={navigateToLostAndFoundViewMatchedUserS}
             onNavigateToViewLostAndFoundSuggestions={navigateToViewLostAndFoundSuggestions}
             onNavigateToSuggestionsForm={navigateToSuggestionsForm}
           />
@@ -405,18 +398,6 @@ const App = () => {
         ) : currentScreen === "LostAndFoundViewMatchedUser" ? (
           <ProtectedRoute
             component={LostAndFoundViewMatchedUser}
-            onSignUpClick={handleSignUpClick}
-            onLoginSuccess={handleLoginSuccess}
-            onNavigateToHome={navigateToHome}
-            onNavigateToProfile={navigateToProfile}
-            onNavigateToLostAndFoundDogMatched={navigateToLostAndFoundDogMatched}
-            onLogout={handleLogout}
-            onNavigateToChatForum={navigateToChatForum}
-            dog={selectedDog}
-          />
-        ) : currentScreen === "LostAndFoundViewMatchedUserS" ? (
-          <ProtectedRoute
-            component={LostAndFoundViewMatchedUserS}
             onSignUpClick={handleSignUpClick}
             onLoginSuccess={handleLoginSuccess}
             onNavigateToHome={navigateToHome}

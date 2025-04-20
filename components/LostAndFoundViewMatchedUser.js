@@ -73,6 +73,11 @@ const LostAndFoundViewMatchedUser = ({
       onNavigateToLostDogPage();
     }
   };
+  const toCapitalize = (str) => {
+    // ----------------------------- To capitalized first letter of the word ----------------------------------//
+    if (!str || typeof str !== "string") return "";
+    return str.replace(/\b\w/, (char) => char.toUpperCase());
+  };
 
   return (
     <SafeAreaView style={styles.mainWrapper}>
@@ -133,7 +138,7 @@ const LostAndFoundViewMatchedUser = ({
             source={require("../assets/images/back-arrow.png")}
             style={styles.arrowIcon}
           />
-          <Text style={styles.mainTitle}>View Info</Text>
+          <Text style={styles.mainTitle}>Dog info</Text>
         </TouchableOpacity>
 
         <View style={styles.card}>
@@ -141,7 +146,7 @@ const LostAndFoundViewMatchedUser = ({
             source={{ uri: `http://localhost:5000${dog.imagePath}` }}
             style={styles.missingDogImage}
           />
-          <View style={styles.info}>
+          <View style={styles.dogInfo}>
             <Text style={styles.petId}>Pet ID #: {dog.petId}</Text>
             <Text style={styles.name}>Name: {dog.name}</Text>
             <Text style={styles.name}>category: {dog.category}</Text>
@@ -189,15 +194,25 @@ const LostAndFoundViewMatchedUser = ({
               </View>
             )}
             {/* Added container and icon for Unique markings/features */}
-            <View style={styles.uniqueMarkingsContainer}>
+            <View style={styles.additionalDetailsContainer}>
               <Image
                 source={require("../assets/images/details.png")}
                 style={styles.icon}
               />
-              <Text style={styles.uniqueMarkings}>
-                <Text style={styles.label}>Unique markings/features: </Text>
-                {dog.details}
-              </Text>
+              {/* Added container and icon for Unique markings/features */}
+              {dog.details ? (
+                <View style={styles.additionalDetailsContainer}>
+                  <Text style={styles.additionalDetails}>
+                    <Text style={styles.label}>Additional details: </Text>
+                    {dog.details}
+                  </Text>
+                </View>
+              ) : (
+                <Text style={styles.additionalDetails}>
+                  <Text style={styles.label}>Additional details: </Text>
+                  No additional details provided
+                </Text>
+              )}
             </View>
             {/* Added icon for Posted by */}
             <View style={styles.postedBy}>
@@ -334,9 +349,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     resizeMode: "contain",
   },
-  info: {
+  dogInfo: {
     marginTop: 10,
     width: "100%",
+    textTransform: "capitalize",
   },
   petId: {
     fontSize: 14,
@@ -390,13 +406,13 @@ const styles = StyleSheet.create({
   contact: {
     fontSize: 16,
   },
-  uniqueMarkingsContainer: {
+  additionalDetailsContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 5,
   },
-  uniqueMarkings: {
-    fontSize: 16,
+  additionalDetails: {
+    fontSize: 15.5,
   },
   postedBy: {
     padding: 6,

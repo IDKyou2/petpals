@@ -1,3 +1,5 @@
+// ----------------------------------------------------------------- Matched Page --------------------------------------------------------//
+
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -720,6 +722,12 @@ const LostAndFoundDogMatched = ({
     }
   }, [matches, currentUserId]);
 
+  const toCapitalize = (str) => {
+    // ----------------------------- To capitalized first letter of the word ----------------------------------//
+    if (!str || typeof str !== "string") return "";
+    return str.replace(/\b\w/, (char) => char.toUpperCase());
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -760,6 +768,7 @@ const LostAndFoundDogMatched = ({
         </TouchableOpacity>
       </Modal>
 
+      {/* ------------------------------------------------- NAVBAR ----------------------------------------------- */}
       <View style={styles.navBar}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <TouchableOpacity
@@ -778,7 +787,7 @@ const LostAndFoundDogMatched = ({
             style={styles.navButton}
             onPress={() => handleTabClick("HomePageMatched")}
           >
-            <Text style={styles.navTexts}>Matched Page</Text>
+            <Text style={styles.navTexts}>Match Page</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.navButton}
@@ -788,6 +797,7 @@ const LostAndFoundDogMatched = ({
           </TouchableOpacity>
         </ScrollView>
       </View>
+      {/* ------------------------------------------------- NAVBAR END ----------------------------------------------- */}
 
       <View style={styles.searchContainer}>
         <TextInput
@@ -871,29 +881,32 @@ const LostAndFoundDogMatched = ({
                       {dog.breed}, {dog.gender}
                     </Text>
                   )}
-                  {/* --------------------------- Last seen location ------------------------------- */}
+                  {/* --------------------------- Last seen location field ------------------------------- */}
                   <View style={styles.cardLocation}>
                     {isEditing ? (
-                      <TextInput
-                        style={styles.editInput}
-                        value={editedDog.location || ""}
-                        onChangeText={(text) =>
-                          handleInputChange("location", text)
-                        }
-                        placeholder="Location"
-                      />
+                      <View>
+                        <TextInput
+                          style={styles.editInput}
+                          value={editedDog.location || ""}
+                          onChangeText={(text) =>
+                            handleInputChange("location", text)
+                          }
+                          placeholder="Enter last seen location"
+                          placeholderTextColor="#999"
+                        />
+                        <Image
+                          source={require("../assets/images/location-icon.png")}
+                          style={styles.locationIcon}
+                        />
+                      </View>
                     ) : (
                       <Text style={styles.cardLocationText}>
-                        {dog.category === "Found" ? "Found at:" : "Last seen:"}{" "}
-                        {dog.location} 🐶
+                        {dog.category === "Found" ? "Found at:" : "Last seen location:"}{" "}
+                        {toCapitalize(dog.location)}
                       </Text>
-                    )
-                    }
-                    <Image
-                      source={require("../assets/images/location-icon.png")}
-                      style={styles.locationIcon}
-                    />
+                    )}
                   </View>
+                  {/* --------------------------- Last seen location field end ------------------------------- */}
 
                   <Text style={styles.cardTimestamp}>
                     {dog.category === "Found" ? "Found on:" : "Lost on:"}{" "}
@@ -1291,7 +1304,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: "#f0f0f0",
   },
-  cardContent: { flex: 1 },
+  cardContent: { flex: 1, },
+
   petIdText: {
     fontSize: 14,
     fontWeight: "bold",
@@ -1309,12 +1323,20 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     textTransform: "capitalize"
   },
-  cardSubtitle: { fontSize: 16, color: "#666", marginBottom: 5, textTransform: "capitalize" },
+  cardSubtitle: { fontSize: 16, color: "#666", marginBottom: 5, textTransform: "capitalize", },
+  cardLocation: { flexDirection: "row", alignItems: "center", marginBottom: 5, width: "100%", },
 
-  cardLocation: { flexDirection: "row", alignItems: "center", marginBottom: 5 },
+  locationIcon: {
+    position: "absolute",
+    right: 12,
+    top: "50%",
+    transform: [{ translateY: -13 }], // center vertically
+    width: 16,
+    height: 16,
+    tintColor: "#666",
+  },
 
-  locationIcon: { width: 16, marginRight: 5, height: 16, tintColor: "#666" },
-  cardLocationText: { fontSize: 14, color: "#666", flexShrink: 1 },
+  cardLocationText: { fontSize: 14, color: "#666", flexShrink: 1,},
   cardTimestamp: { fontSize: 12, color: "#666", marginBottom: 5 },
   cardCategory: {
     fontSize: 14,
@@ -1382,6 +1404,8 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     fontSize: 16,
+    width: "100%",
+    
   },
   imageUploadContainer: { alignItems: "center", marginBottom: 10 },
   uploadText: {
@@ -1581,12 +1605,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  //-------------- Success message color --------------//
   successMessageContainer: {
     position: "absolute",
     top: "50%",
     left: "50%",
     transform: [{ translateX: -150 }, { translateY: -20 }],
-    backgroundColor: "rgba(0, 128, 0, 0.9)",
+    backgroundColor: "#664229", //dark-brown color
+    //backgroundColor: "#D2B48C", //light-brown color
     padding: 15,
     borderRadius: 10,
     width: 300,
@@ -1596,6 +1622,7 @@ const styles = StyleSheet.create({
   },
   successMessageText: {
     color: "#fff",
+
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",

@@ -132,9 +132,8 @@ const LostDogPage = ({
   const closeModal = () => setIsModalOpen(false);
   const handleMoreInfoClick = (dog) => onNavigateToLostDogViewUserInfo?.(dog);
   const handleAddClick = () => onNavigateToLostDogForm?.();
-
-  // ----------------------------- To capitalized first letter of the word ----------------------------------//
   const toCapitalize = (str) => {
+    // ----------------------------- To capitalized first letter of the word ----------------------------------//
     if (!str || typeof str !== "string") return "";
     return str.replace(/\b\w/, (char) => char.toUpperCase());
   };
@@ -259,7 +258,7 @@ const LostDogPage = ({
                   />
                   <Text style={styles.cardLocationText}>
                     {dog.category === "Found" ? "Found at:" : "Last seen:"}{" "}
-                    {toCapitalize(dog.location)} 
+                    {toCapitalize(dog.location)}
                   </Text>
                 </View>
                 <Text style={styles.cardTimestamp}>
@@ -270,7 +269,7 @@ const LostDogPage = ({
                   style={[
                     styles.cardCategory,
                     toCapitalize(dog.category) === "Found" && styles.foundCategoryText,
-                  ]}  
+                  ]}
                 >
                   Category: {toCapitalize(dog.category) || "Lost"}
                 </Text>
