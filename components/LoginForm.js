@@ -22,7 +22,7 @@ const LoginForm = ({ onSignUpClick, onLoginSuccess }) => {
     setErrorMessage("");
 
     if (!username || !password) {
-      setErrorMessage("Username or password cannot be blank!");
+      setErrorMessage("Username or password cannot be blank.\nPlease try again.");
       return;
     }
 
@@ -49,7 +49,8 @@ const LoginForm = ({ onSignUpClick, onLoginSuccess }) => {
           error.response.data.message || "Incorrect username or password."
         );
       } else {
-        setErrorMessage("Something went wrong. Please try again later.");
+        setErrorMessage("Something went wrong. Check your database.");
+        //setErrorMessage("Something went wrong. Please try again later.");
       }
     }
   };

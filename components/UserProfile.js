@@ -305,7 +305,7 @@ const UserProfile = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
                 Email: {userData?.email || "Email not found."}
               </Text>
               <Text style={styles.contactText}>
-                Contact #: {userData?.contact || "COntact not found."}
+                Contact #: {userData?.contact || "Contact not found."}
               </Text>
               <TouchableOpacity
                 //------------------------------ Edit button -------------------------//

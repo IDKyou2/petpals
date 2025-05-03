@@ -299,7 +299,7 @@ const ViewLostAndFoundSuggestions = ({
       {/* Content */}
       <ScrollView contentContainerStyle={styles.content}>
         {suggestions.length === 0 ? (
-          <Text style={styles.placeholderText}>No suggestions yet.</Text>
+          <Text style={styles.placeholderText}>No suggestions posted yet.</Text>
         ) : (
           suggestions.map((suggestion, index) => {
             const createdAt = new Date(suggestion.createdAt);
