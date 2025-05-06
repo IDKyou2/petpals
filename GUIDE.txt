@@ -1,0 +1,11 @@
+User data{
+    fullName 
+    contact
+    email
+    username
+    profilePic
+}
+
+User data edit{
+    setNewContact = new contact number
+}

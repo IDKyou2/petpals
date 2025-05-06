@@ -1,3 +1,6 @@
+import { MaterialIcons } from '@expo/vector-icons'; // if using Expo
+// or
+import Icon from 'react-native-vector-icons/MaterialIcons'; // if using react-native-vector-icons directly
 import React, { useState, useEffect } from "react";
 import {
   // These are React Native UI components like buttons, inputs, modals, etc.
@@ -61,8 +64,9 @@ const UserProfile = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
             username: userResponse.data.username || "Username not found.",
             profilePic: userResponse.data.profilePic || "/default-avatar.png",
           });
+          // ----------------------------------------------------------- Update data ----------------------------------------//
           setNewContact(userResponse.data.contact || "Error updating contact number.");
-
+          setNewProfile(userResponse.data.profilePic || "Error updating profile picture.");
           const messagesResponse = await axios.get(
             `${SERVER_URL}/api/chat/private-messages/${userResponse.data.fullName}`,
             { headers: { Authorization: `Bearer ${token}` } }
@@ -162,16 +166,56 @@ const UserProfile = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
   const editInfo = () => setIsEditing(true);
 
 
-  // ---------------- Save changes button ------------------//
+  // --------------------------------------------------------  Save changes button ------------------------------------------//
   const handleSaveChanges = () => {
-    if (!newContact.trim()) return;
-    setConfirmationModalVisible(true);
-  };
-
+    if (newContact.length < 11) {
+      window.alert("Please enter a valid contact number.");
+    }else{
+      if (!newContact.trim()) return;
+      setConfirmationModalVisible(true);
+    }
+  }; 
 
 
   // ---------------- Confirm button ------------------//
   const handleConfirmChanges = async () => {
+    const token = await AsyncStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const response = await axios.put(
+        `${SERVER_URL}/api/auth/user/profile`,
+        {
+          fullName: userData.fullName,
+          contact: newContact,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        // ----------------------------------------- Update the user data in the state --------------------------------------------
+        setUserData({ ...userData, contact: newContact });
+        setIsEditing(false);
+        setConfirmationModalVisible(false);
+      }
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+    }
+  };
+
+  const handleCancelChanges = () => {
+    setConfirmationModalVisible(false);
+    setIsEditing(false);
+    setNewContact(userData?.contact || "Contact not found.");
+  };
+
+  // ---------------- Edit Profile pic button ------------------//
+  const editProfilePic = async () => {
     const token = await AsyncStorage.getItem("token");
     if (!token) return;
 
@@ -198,12 +242,6 @@ const UserProfile = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
     } catch (error) {
       console.error("Error updating user profile:", error);
     }
-  };
-
-  const handleCancelChanges = () => {
-    setConfirmationModalVisible(false);
-    setIsEditing(false);
-    setNewContact(userData?.contact || "09XXXXXXXXX");
   };
 
   return (
@@ -245,7 +283,9 @@ const UserProfile = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
 
       {/* User Profile Section */}
       <ScrollView contentContainerStyle={styles.content}>
+
         <View style={styles.profileContainer}>
+          {/* ---------------------------------------------- Profile image and name ---------------------------------/ */}
           <Image
             source={
               userData?.profilePic
@@ -254,10 +294,17 @@ const UserProfile = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
             }
             style={styles.profileImage}
           />
+          <TouchableOpacity
+            //------------------------------ Edit button save -------------------------//
+            onPress={editProfilePic}
+            style={styles.editIcon}
+          >
+            <MaterialIcons name="image" size={24} color="black" />
+          </TouchableOpacity>
           <Text style={styles.profileNameText}>
             {userData?.fullName || "User"}
           </Text>
-          {/* -------------------------------------------------------------------------------------- Editting ---------------------------------// */}
+          {/* -------------------------------------------------------------------------------------- Editting clicked ---------------------------------// */}
           {isEditing ? (
             <View style={styles.editContainer}>
               <Text style={styles.nameText}>
@@ -298,7 +345,7 @@ const UserProfile = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
             </View>
           ) : (
             <View style={styles.profileCard}>
-               <Text style={styles.emailText}>
+              <Text style={styles.emailText}>
                 Username: {userData?.username || "Username not found."}
               </Text>
               <Text style={styles.emailText}>
@@ -308,7 +355,7 @@ const UserProfile = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
                 Contact #: {userData?.contact || "Contact not found."}
               </Text>
               <TouchableOpacity
-                //------------------------------ Edit button -------------------------//
+                //------------------------------ Edit button save -------------------------//
                 onPress={editInfo}
                 style={styles.editButton}
               >
@@ -546,6 +593,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 10,
     alignSelf: "center",
+  },
+  //-------------- Edit icon style -------------------//
+  editIcon: {
+    position: 'absolute', // Position absolutely within the container
+    top: 90, // Adjust as needed
+    borderRadius: 20,
   },
   editButtonText: {
     color: "#fff",
