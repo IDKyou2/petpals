@@ -1,5 +1,9 @@
+import { MaterialIcons } from '@expo/vector-icons'; // if using Expo
+// or
+import Icon from 'react-native-vector-icons/MaterialIcons'; // if using react-native-vector-icons directly
 import React, { useState, useEffect } from "react";
 import {
+  // These are React Native UI components like buttons, inputs, modals, etc.
   View,
   Text,
   TouchableOpacity,
@@ -10,16 +14,17 @@ import {
   ScrollView,
   Platform,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import io from "socket.io-client";
-import useChatCount from "./hooks/useChatCount";
+import AsyncStorage from "@react-native-async-storage/async-storage"; //Used to store and retrieve data locally (like the login token).
+import axios from "axios"; //To make HTTP requests (like GET, PUT) to your backend server.
+import io from "socket.io-client"; //Used for real-time communication (like messaging/chat notifications).
+import useChatCount from "./hooks/useChatCount"; //A custom hook you probably made that tells you how many new chats/messages there are.
 import NotificationModal from "./NotificationModal";
 
+//This is a smart way to handle Android emulator IP differences. Android emulators use 10.0.2.2 instead of localhost.
 const SERVER_URL =
   Platform.OS === "android" ? "http://10.0.2.2:5000" : "http://localhost:5000";
 
-const ProfileUser = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
+const UserProfile = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userData, setUserData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -31,7 +36,9 @@ const ProfileUser = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
   const [messages, setMessages] = useState([]);
   const newChatsCount = useChatCount();
 
+
   useEffect(() => {
+    //useEffect - Fetching Data
     const fetchUserDataAndPostsCount = async () => {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
@@ -49,18 +56,22 @@ const ProfileUser = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
         );
 
         if (userResponse.status === 200) {
+          // ----------------------------------------------------------------- User data ----------------------------------------------------//
           setUserData({
-            fullName: userResponse.data.fullName || "User",
-            contact: userResponse.data.contact || "09XXXXXXXXX",
-            email: userResponse.data.email || "user@gmail.com",
+            fullName: userResponse.data.fullName || "User's full name not found.",
+            contact: userResponse.data.contact || "Contact not found.",
+            email: userResponse.data.email || "Email not found.",
+            username: userResponse.data.username || "Username not found.",
             profilePic: userResponse.data.profilePic || "/default-avatar.png",
           });
-          setNewContact(userResponse.data.contact || "09XXXXXXXXX");
-
+          // ----------------------------------------------------------- Update data ----------------------------------------//
+          setNewContact(userResponse.data.contact || "Error updating contact number.");
+          setNewProfile(userResponse.data.profilePic || "Error updating profile picture.");
           const messagesResponse = await axios.get(
             `${SERVER_URL}/api/chat/private-messages/${userResponse.data.fullName}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
+          // ------------------------ Chats --------------------------//
           setMessages(
             messagesResponse.data.map((msg) => ({
               id: msg._id,
@@ -155,25 +166,56 @@ const ProfileUser = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
   const editInfo = () => setIsEditing(true);
 
 
-  // ---------------- Save changes button ------------------//
+  // --------------------------------------------------------  Save changes button ------------------------------------------//
   const handleSaveChanges = () => {
-    if (!newContact.trim()) return;
-    setConfirmationModalVisible(true);
-  };
+    if (newContact.length < 11) {
+      window.alert("Please enter a valid contact number.");
+    }else{
+      if (!newContact.trim()) return;
+      setConfirmationModalVisible(true);
+    }
+  }; 
 
-  const VALID_PH_PREFIXES = [
-    "0905", "0906", "0907", "0908", "0909", "0910", "0911", "0912", "0913",
-    "0914", "0915", "0916", "0917", "0918", "0919", "0920", "0921", "0922",
-    "0923", "0924", "0925", "0926", "0927", "0928", "0929", "0930", "0935",
-    "0936", "0937", "0938", "0939", "0940", "0945", "0946", "0947", "0948",
-    "0949", "0950", "0951", "0953", "0954", "0955", "0956", "0965", "0966",
-    "0967", "0970", "0975", "0976", "0977", "0978", "0979", "0981", "0989",
-    "0991", "0992", "0993", "0994", "0995", "0996", "0997", "0998", "0999",
-    "0895", "0896", "0897", "0898"
-  ];
 
   // ---------------- Confirm button ------------------//
   const handleConfirmChanges = async () => {
+    const token = await AsyncStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const response = await axios.put(
+        `${SERVER_URL}/api/auth/user/profile`,
+        {
+          fullName: userData.fullName,
+          contact: newContact,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        // ----------------------------------------- Update the user data in the state --------------------------------------------
+        setUserData({ ...userData, contact: newContact });
+        setIsEditing(false);
+        setConfirmationModalVisible(false);
+      }
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+    }
+  };
+
+  const handleCancelChanges = () => {
+    setConfirmationModalVisible(false);
+    setIsEditing(false);
+    setNewContact(userData?.contact || "Contact not found.");
+  };
+
+  // ---------------- Edit Profile pic button ------------------//
+  const editProfilePic = async () => {
     const token = await AsyncStorage.getItem("token");
     if (!token) return;
 
@@ -200,12 +242,6 @@ const ProfileUser = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
     } catch (error) {
       console.error("Error updating user profile:", error);
     }
-  };
-
-  const handleCancelChanges = () => {
-    setConfirmationModalVisible(false);
-    setIsEditing(false);
-    setNewContact(userData?.contact || "09XXXXXXXXX");
   };
 
   return (
@@ -247,7 +283,9 @@ const ProfileUser = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
 
       {/* User Profile Section */}
       <ScrollView contentContainerStyle={styles.content}>
+
         <View style={styles.profileContainer}>
+          {/* ---------------------------------------------- Profile image and name ---------------------------------/ */}
           <Image
             source={
               userData?.profilePic
@@ -256,14 +294,24 @@ const ProfileUser = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
             }
             style={styles.profileImage}
           />
+          <TouchableOpacity
+            //------------------------------ Edit button save -------------------------//
+            onPress={editProfilePic}
+            style={styles.editIcon}
+          >
+            <MaterialIcons name="image" size={24} color="black" />
+          </TouchableOpacity>
           <Text style={styles.profileNameText}>
             {userData?.fullName || "User"}
           </Text>
+          {/* -------------------------------------------------------------------------------------- Editting clicked ---------------------------------// */}
           {isEditing ? (
             <View style={styles.editContainer}>
               <Text style={styles.nameText}>
-                {userData?.fullName || "User"}
+                Full name: {userData?.fullName || "User"}
               </Text>
+
+              <Text style={styles.nameText}>Contact number:</Text>
               <TextInput
                 style={styles.contactInput}
                 value={newContact}
@@ -298,13 +346,16 @@ const ProfileUser = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
           ) : (
             <View style={styles.profileCard}>
               <Text style={styles.emailText}>
-                Email: {userData?.email || "juan@example.com"}
+                Username: {userData?.username || "Username not found."}
+              </Text>
+              <Text style={styles.emailText}>
+                Email: {userData?.email || "Email not found."}
               </Text>
               <Text style={styles.contactText}>
-                Contact #: {userData?.contact || "09106993468"}
+                Contact #: {userData?.contact || "Contact not found."}
               </Text>
               <TouchableOpacity
-                //------------------------------ Edit button -------------------------//
+                //------------------------------ Edit button save -------------------------//
                 onPress={editInfo}
                 style={styles.editButton}
               >
@@ -426,6 +477,7 @@ const ProfileUser = ({ onNavigateToHome, onLogout, onNavigateToChatForum }) => {
   );
 };
 
+// -------------------------------------------------------------------------- CSS  -------------------------------------------------------- //
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#D2B48C" },
   header: {
@@ -507,7 +559,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   editContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: "#ffff",
     borderRadius: 10,
     padding: 20,
     alignItems: "center",
@@ -541,6 +593,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 10,
     alignSelf: "center",
+  },
+  //-------------- Edit icon style -------------------//
+  editIcon: {
+    position: 'absolute', // Position absolutely within the container
+    top: 90, // Adjust as needed
+    borderRadius: 20,
   },
   editButtonText: {
     color: "#fff",
@@ -710,4 +768,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileUser;
+export default UserProfile;

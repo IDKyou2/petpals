@@ -70,9 +70,11 @@ router.get("/user/profile", async (req, res) => {
     }
 
     res.json({
+      // User details //
       fullName: userData.fullName,
       contact: userData.contact,
       email: userData.email,
+      username: userData.username,
       profilePic: userData.profilePic
         ? `/uploads/${path.basename(userData.profilePic)}`
         : "/uploads/default-user.png",

@@ -58,7 +58,7 @@ const RegisterForm = ({ onLoginClick }) => {
     setSuccess(null);
 
     if (!profilePic) {
-      setError("Please upload a profile picture.");
+      setError("Please upload profile picture.");
       return;
     }
     if (!username || !username.trim()) {
@@ -84,7 +84,7 @@ const RegisterForm = ({ onLoginClick }) => {
     // Validate basic email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(cleanEmail)) {
-      setError('Invalid email format (e.g., user@example.com)');
+      setError('Invalid email format. (ex. user@email.com)');
       return;
     }
 
@@ -99,10 +99,6 @@ const RegisterForm = ({ onLoginClick }) => {
       return;
     }
 
-    if (!isValidDomain) {
-      setError('Please use Yahoo, Gmail, or Hotmail.');
-      return;
-    }
 
     // ------------------------------------------------------- Validate contact number ----------------------------------------------------
     if (!contact) {
@@ -116,7 +112,7 @@ const RegisterForm = ({ onLoginClick }) => {
     const phNumber = contact.replace(/\D/g, '');
 
     if (!/^(09|\+639)\d{9}$/.test(phNumber)) {
-      setError("Invalid contact number. (e.g. 09XXXXXXXXX)");
+      setError("Invalid contact number. (ex. 09XXXXXXXXX)");
       return;
     }
     if (!password?.trim()) {
@@ -227,7 +223,7 @@ const RegisterForm = ({ onLoginClick }) => {
             />
             <TextInput
               style={styles.input}
-              placeholder="Contact Number (e.g. 09XXXXXXXXX)"
+              placeholder="Contact Number (ex. 09XXXXXXXXX)"
               value={contact}
               onChangeText={(text) => {
                 const numericText = text.replace(/[^0-9]/g, "");

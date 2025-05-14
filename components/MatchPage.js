@@ -1,813 +1,813 @@
-// ----------------------------------------------------------------- Matched Page --------------------------------------------------------//
+  // ----------------------------------------------------------------- Matched Page --------------------------------------------------------//
 
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Modal,
-  StyleSheet,
-  Image,
-  ScrollView,
-  Platform,
-  TextInput,
-  ActivityIndicator,
-} from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import io from "socket.io-client";
-import useChatCount from "./hooks/useChatCount";
-import NotificationModal from "./NotificationModal";
-import * as tf from "@tensorflow/tfjs";
-import * as mobilenet from "@tensorflow-models/mobilenet";
-import "@tensorflow/tfjs-backend-cpu";
-import "@tensorflow/tfjs-backend-webgl";
-import * as ImagePicker from "expo-image-picker";
-import md5 from "js-md5";
+  import React, { useState, useEffect } from "react";
+  import {
+    View,
+    Text,
+    TouchableOpacity,
+    Modal,
+    StyleSheet,
+    Image,
+    ScrollView,
+    Platform,
+    TextInput,
+    ActivityIndicator,
+  } from "react-native";
+  import AsyncStorage from "@react-native-async-storage/async-storage";
+  import axios from "axios";
+  import io from "socket.io-client";
+  import useChatCount from "./hooks/useChatCount";
+  import NotificationModal from "./NotificationModal";
+  import * as tf from "@tensorflow/tfjs";
+  import * as mobilenet from "@tensorflow-models/mobilenet";
+  import "@tensorflow/tfjs-backend-cpu";
+  import "@tensorflow/tfjs-backend-webgl";
+  import * as ImagePicker from "expo-image-picker";
+  import md5 from "js-md5";
 
-const decodeJWT = (token) => {
-  try {
-    const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split("")
-        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join("")
-    );
-    return JSON.parse(jsonPayload);
-  } catch (error) {
-    console.error("Error decoding JWT:", error);
-    return null;
-  }
-};
-
-const LostAndFoundDogMatched = ({
-  onNavigateToHome,
-  onNavigateToProfile,
-  onLogout,
-  onNavigateToLostDogPage,
-  onNavigateToFoundDogPage,
-  onNavigateToChatForum,
-  onNavigateToLostAndFoundViewMatchedUser,
-  onNavigateToLostAndFoundViewMatchedUserS,
-  onNavigateToSuggestionsForm,
-  onNavigateToViewLostAndFoundSuggestions,
-}) => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [dogs, setDogs] = useState([]);
-  const [newPostsCount, setNewPostsCount] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [matches, setMatches] = useState([]);
-  const [isMatchModalOpen, setIsMatchModalOpen] = useState(false);
-  const [selectedMatches, setSelectedMatches] = useState([]);
-  const [isNewMatchModalOpen, setIsNewMatchModalOpen] = useState(false);
-  const [selectedNewMatch, setSelectedNewMatch] = useState(null);
-  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [editMode, setEditMode] = useState(null);
-  const [editedDog, setEditedDog] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const newChatsCount = useChatCount();
-  const [currentUserId, setCurrentUserId] = useState(null);
-  const [showFullName1, setShowFullName1] = useState(false);
-  const [showFullName2, setShowFullName2] = useState(false);
-  const [successMessage, setSuccessMessage] = useState(null);
-
-  useEffect(() => {
-    const fetchCurrentUserId = async () => {
-      try {
-        const token = await AsyncStorage.getItem("token");
-        if (token) {
-          const decoded = decodeJWT(token);
-          if (decoded && decoded.userId) {
-            setCurrentUserId(decoded.userId);
-            console.log("Current User ID set:", decoded.userId);
-          } else {
-            console.log("No userId in decoded token:", decoded);
-          }
-        } else {
-          console.log("No token found in AsyncStorage");
-        }
-      } catch (error) {
-        console.error("Error fetching current user ID:", error);
-      }
-    };
-    fetchCurrentUserId();
-  }, []);
-
-  const getFirstName = (fullName) => {
-    if (!fullName) return "Unknown";
-    return fullName.split(" ")[0];
-  };
-
-  useEffect(() => {
-    const initializeTfjs = async () => {
-      try {
-        if (Platform.OS === "web") {
-          await tf.setBackend("webgl");
-        } else {
-          await tf.setBackend("cpu");
-        }
-        await tf.ready();
-        console.log("TensorFlow.js initialized with backend:", tf.getBackend());
-      } catch (error) {
-        console.error("Error initializing TensorFlow.js:", error);
-      }
-    };
-    initializeTfjs();
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = await AsyncStorage.getItem("token");
-        if (!token) return;
-
-        const lostResponse = await axios.get(
-          "http://localhost:5000/api/lostdog",
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        const foundResponse = await axios.get(
-          "http://localhost:5000/api/founddog",
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        const postsResponse = await axios.get(
-          "http://localhost:5000/api/posts/new-posts-count"
-        );
-
-        const allDogs = [
-          ...(lostResponse.status === 200 ? lostResponse.data.lostDogs : []),
-          ...(foundResponse.status === 200 ? foundResponse.data.foundDogs : []),
-        ]
-          .filter((dog) => !dog.reunited)
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-        console.log(
-          "All dogs with image paths:",
-          allDogs.map((dog) => ({
-            petId: dog.petId,
-            imagePath: dog.imagePath,
-            userId: dog.userId?._id,
-            category: dog.category,
-          }))
-        );
-
-        setDogs(allDogs);
-        if (postsResponse.status === 200) {
-          setNewPostsCount(postsResponse.data.newPostsCount);
-        }
-        await processImages(allDogs);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-
-    const socket = io("http://localhost:5000", { transports: ["websocket"] });
-
-    socket.on("connect", () =>
-      console.log("Connected to Socket.IO server:", socket.id)
-    );
-
-    socket.on("newLostDog", (newDog) => {
-      if (!newDog.reunited) {
-        setDogs((prevDogs) => {
-          const updatedDogs = [newDog, ...prevDogs].sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          );
-          processImages(updatedDogs);
-          return updatedDogs;
-        });
-      }
-    });
-
-    socket.on("newFoundDog", (newDog) => {
-      if (!newDog.reunited) {
-        setDogs((prevDogs) => {
-          const updatedDogs = [newDog, ...prevDogs].sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          );
-          processImages(updatedDogs);
-          return updatedDogs;
-        });
-      }
-    });
-
-    socket.on("dogReunited", ({ petId }) => {
-      setDogs((prevDogs) => {
-        const updatedDogs = prevDogs.filter((dog) => dog.petId !== petId);
-        processImages(updatedDogs);
-        return updatedDogs;
-      });
-      setMatches((prevMatches) =>
-        prevMatches.filter(
-          (match) => match.petId1 !== petId && match.petId2 !== petId
-        )
-      );
-    });
-
-    socket.on("updatedLostDog", (updatedDog) => {
-      setDogs((prevDogs) => {
-        const updatedDogs = prevDogs.map((dog) =>
-          dog.petId === updatedDog.petId ? updatedDog : dog
-        );
-        processImages(updatedDogs);
-        return updatedDogs;
-      });
-    });
-
-    socket.on("updatedFoundDog", (updatedDog) => {
-      setDogs((prevDogs) => {
-        const updatedDogs = prevDogs.map((dog) =>
-          dog.petId === updatedDog.petId ? updatedDog : dog
-        );
-        processImages(updatedDogs);
-        return updatedDogs;
-      });
-    });
-
-    socket.on("disconnect", () =>
-      console.log("Disconnected from Socket.IO server")
-    );
-
-    return () => socket.disconnect();
-  }, []);
-
-  const filteredDogs = dogs.filter((dog) => {
-    const query = searchQuery.toLowerCase();
-    const location = dog.location ? String(dog.location).toLowerCase() : "";
-    const breed = dog.breed ? String(dog.breed).toLowerCase() : "";
-    const gender = dog.gender ? String(dog.gender).toLowerCase() : "";
-    const name = dog.name ? String(dog.name).toLowerCase() : "";
-
-    return (
-      location.includes(query) ||
-      breed.includes(query) ||
-      gender.includes(query) ||
-      name.includes(query)
-    );
-  });
-
-  const createImageElement = (src) => {
-    return new Promise((resolve, reject) => {
-      if (Platform.OS === "web") {
-        const img = document.createElement("img");
-        img.src = src;
-        img.crossOrigin = "Anonymous"; // Handle CORS
-        img.onload = () => resolve(img);
-        img.onerror = () =>
-          reject(new Error(`Failed to load image from ${src}`));
-      } else {
-        // For native, we can't use DOM Image; skip TensorFlow processing
-        reject(new Error("Image processing not supported on native platform"));
-      }
-    });
-  };
-
-  const processImages = async (dogList) => {
+  const decodeJWT = (token) => {
     try {
-      const model = await mobilenet.load();
-      const dogsWithImages = dogList.filter((dog) => dog.imagePath);
-      const dogMatches = [];
-
-      console.log("Processing dogs:", dogsWithImages.length, "dogs found");
-      console.log(
-        "Dogs to process:",
-        dogsWithImages.map((d) => ({
-          petId: d.petId,
-          userId: d.userId?._id,
-          category: d.category,
-          imagePath: d.imagePath,
-        }))
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
       );
+      return JSON.parse(jsonPayload);
+    } catch (error) {
+      console.error("Error decoding JWT:", error);
+      return null;
+    }
+  };
 
-      const imageData = await Promise.all(
-        dogsWithImages.map(async (dog) => {
-          const imageUrl = `http://localhost:5000${dog.imagePath}`;
-          console.log(`Fetching image for ${dog.petId}: ${imageUrl}`);
-          try {
-            const response = await fetch(imageUrl);
-            if (!response.ok)
-              throw new Error(`HTTP error! Status: ${response.status}`);
-            const blob = await response.blob();
-            const arrayBuffer = await blob.arrayBuffer();
-            const hash = md5(arrayBuffer);
+  const LostAndFoundDogMatched = ({
+    onNavigateToHome,
+    onNavigateToProfile,
+    onLogout,
+    onNavigateToLostDogPage,
+    onNavigateToFoundDogPage,
+    onNavigateToChatForum,
+    onNavigateToLostAndFoundViewMatchedUser,
+    onNavigateToLostAndFoundViewMatchedUserS,
+    onNavigateToSuggestionsForm,
+    onNavigateToViewLostAndFoundSuggestions,
+  }) => {
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [dogs, setDogs] = useState([]);
+    const [newPostsCount, setNewPostsCount] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [matches, setMatches] = useState([]);
+    const [isMatchModalOpen, setIsMatchModalOpen] = useState(false);
+    const [selectedMatches, setSelectedMatches] = useState([]);
+    const [isNewMatchModalOpen, setIsNewMatchModalOpen] = useState(false);
+    const [selectedNewMatch, setSelectedNewMatch] = useState(null);
+    const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [editMode, setEditMode] = useState(null);
+    const [editedDog, setEditedDog] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const newChatsCount = useChatCount();
+    const [currentUserId, setCurrentUserId] = useState(null);
+    const [showFullName1, setShowFullName1] = useState(false);
+    const [showFullName2, setShowFullName2] = useState(false);
+    const [successMessage, setSuccessMessage] = useState(null);
 
-            if (Platform.OS === "web") {
-              const img = await createImageElement(imageUrl);
-              const tensor = tf.browser
-                .fromPixels(img)
-                .resizeNearestNeighbor([224, 224])
-                .toFloat()
-                .expandDims();
-              const embedding = await model.infer(tensor, true);
-              tf.dispose(tensor);
-              console.log(`Hash for ${dog.petId}: ${hash}`);
-              return { hash, dog, embedding };
+    useEffect(() => {
+      const fetchCurrentUserId = async () => {
+        try {
+          const token = await AsyncStorage.getItem("token");
+          if (token) {
+            const decoded = decodeJWT(token);
+            if (decoded && decoded.userId) {
+              setCurrentUserId(decoded.userId);
+              console.log("Current User ID set:", decoded.userId);
             } else {
-              // For native, skip embedding and only use hash
-              console.log(
-                `Hash for ${dog.petId}: ${hash} (Embedding skipped on native)`
-              );
-              return { hash, dog, embedding: null };
+              console.log("No userId in decoded token:", decoded);
             }
-          } catch (error) {
-            console.error(`Failed to fetch image for ${dog.petId}:`, error);
-            return null;
+          } else {
+            console.log("No token found in AsyncStorage");
           }
-        })
-      ).then((results) => results.filter((r) => r !== null));
-
-      for (let i = 0; i < imageData.length; i++) {
-        for (let j = i + 1; j < imageData.length; j++) {
-          const dog1 = imageData[i].dog;
-          const dog2 = imageData[j].dog;
-          const isSameUser = dog1.userId?._id === dog2.userId?._id;
-          const isDifferentCategory = dog1.category !== dog2.category;
-          const isLostDog =
-            dog1.category === "Lost" || dog2.category === "Lost";
-          const isFoundDog =
-            dog1.category === "Found" || dog2.category === "Found";
-
-          if (
-            imageData[i].hash === imageData[j].hash &&
-            !isSameUser &&
-            isDifferentCategory &&
-            isLostDog &&
-            isFoundDog
-          ) {
-            const colorSimilarity = compareColors(dog1, dog2);
-            dogMatches.push({
-              petId1: dog1.petId,
-              petId2: dog2.petId,
-              similarityPercentage: 100,
-              colorSimilarity: parseFloat(colorSimilarity),
-              isSelfMatch: false,
-            });
-            console.log(
-              `Exact match found: ${dog1.petId} vs ${dog2.petId} with color similarity ${colorSimilarity}%`
-            );
-          } else if (
-            Platform.OS === "web" &&
-            !isSameUser &&
-            isDifferentCategory &&
-            isLostDog &&
-            isFoundDog &&
-            imageData[i].embedding &&
-            imageData[j].embedding
-          ) {
-            const similarity = compareEmbeddings(
-              imageData[i].embedding,
-              imageData[j].embedding
-            );
-            const similarityPercentage = (similarity * 100).toFixed(2);
-            if (similarityPercentage >= 80) {
-              const colorSimilarity = compareColors(dog1, dog2);
-              dogMatches.push({
-                petId1: dog1.petId,
-                petId2: dog2.petId,
-                similarityPercentage: parseFloat(similarityPercentage),
-                colorSimilarity: parseFloat(colorSimilarity),
-                isSelfMatch: false,
-              });
-              console.log(
-                `Non-exact match found: ${dog1.petId} vs ${dog2.petId} with similarity ${similarityPercentage}% and color similarity ${colorSimilarity}%`
-              );
-            }
-          }
+        } catch (error) {
+          console.error("Error fetching current user ID:", error);
         }
-      }
-
-      imageData.forEach((data) => {
-        if (data.embedding) tf.dispose(data.embedding);
-      });
-
-      setMatches(dogMatches);
-      console.log("Matches found:", dogMatches);
-    } catch (error) {
-      console.error("Error processing images:", error);
-    }
-  };
-
-  const compareEmbeddings = (embedding1, embedding2) => {
-    const similarity = tf.losses
-      .cosineDistance(embedding1, embedding2, 0)
-      .dataSync();
-    return 1 - similarity;
-  };
-
-  const compareColors = (dog1, dog2) => {
-    const randomColorSimilarity = Math.random() * 20 + 80;
-    return randomColorSimilarity.toFixed(2);
-  };
-
-  const toggleMenu = () => setMenuOpen(!menuOpen);
-
-  const handleHomeClick = () => {
-    onNavigateToHome?.();
-    setMenuOpen(false);
-  };
-
-  const handleProfileClick = () => {
-    onNavigateToProfile?.();
-    setMenuOpen(false);
-  };
-
-  const handleLogoutClick = async () => {
-    try {
-      await AsyncStorage.removeItem("token");
-      onLogout?.();
-    } catch (error) {
-      console.error("Error during logout:", error);
-    }
-    setMenuOpen(false);
-  };
-
-  const handleTabClick = (tab) => {
-    if (tab === "HomePageLostDog") onNavigateToLostDogPage?.();
-    else if (tab === "HomePageFoundDog") onNavigateToFoundDogPage?.();
-    else if (tab === "HomePageSuggestions") onNavigateToSuggestionsForm?.();
-    else if (tab === "ViewLostAndFoundSuggestions")
-      onNavigateToViewLostAndFoundSuggestions?.();
-  };
-
-  const handleMessageClick = () => onNavigateToChatForum?.();
-
-  const handleNotificationClick = () => setIsModalOpen(true);
-
-  const closeModal = () => setIsModalOpen(false);
-
-  const handleMoreInfoClick = (dog) => {
-    if (dog.category === "Found") {
-      onNavigateToLostAndFoundViewMatchedUserS?.(dog);
-    }
-    if (dog.category === "Lost") {
-      onNavigateToLostAndFoundViewMatchedUser?.(dog);
-    }
-  };
-
-  const getMatchMessage = (dog) => {
-    console.log(
-      `Checking matches for dog ${dog.petId}, currentUserId: ${currentUserId}`
-    );
-    if (dog.userId?._id !== currentUserId) return null;
-
-    const dogMatches = matches.filter(
-      (match) => match.petId1 === dog.petId || match.petId2 === dog.petId
-    );
-    console.log(`Dog ${dog.petId} matches:`, dogMatches);
-    if (dogMatches.length === 0) return null;
-
-    const matchedPetIds = dogMatches.map((match) =>
-      match.petId1 === dog.petId ? match.petId2 : match.petId1
-    );
-
-    if (matchedPetIds.length <= 2) {
-      return `Pet ID #${dog.petId} is matched with Pet ID #${matchedPetIds.join(
-        " and #"
-      )}`;
-    } else {
-      const shortList = matchedPetIds.slice(0, 2);
-      return {
-        shortMessage: `Pet ID #${dog.petId
-          } is matched with Pet ID #${shortList.join(" and #")} and more...`,
-        fullList: matchedPetIds,
       };
-    }
-  };
+      fetchCurrentUserId();
+    }, []);
 
-  const openMatchModal = (matchIds) => {
-    const matchedDogs = matchIds
-      .map((id) => dogs.find((dog) => dog.petId === id))
-      .filter(Boolean);
-    setSelectedMatches(matchedDogs);
-    setIsMatchModalOpen(true);
-  };
+    const getFirstName = (fullName) => {
+      if (!fullName) return "Unknown";
+      return fullName.split(" ")[0];
+    };
 
-  const closeMatchModal = () => {
-    setIsMatchModalOpen(false);
-    setSelectedMatches([]);
-  };
+    useEffect(() => {
+      const initializeTfjs = async () => {
+        try {
+          if (Platform.OS === "web") {
+            await tf.setBackend("webgl");
+          } else {
+            await tf.setBackend("cpu");
+          }
+          await tf.ready();
+          console.log("TensorFlow.js initialized with backend:", tf.getBackend());
+        } catch (error) {
+          console.error("Error initializing TensorFlow.js:", error);
+        }
+      };
+      initializeTfjs();
+    }, []);
 
-  const openNewMatchModal = (match) => {
-    const dog1 = dogs.find((d) => d.petId === match.petId1);
-    const dog2 = dogs.find((d) => d.petId === match.petId2);
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const token = await AsyncStorage.getItem("token");
+          if (!token) return;
 
-    const isDog1CurrentUser = dog1?.userId?._id === currentUserId;
-    const isDog2CurrentUser = dog2?.userId?._id === currentUserId;
-    const isDog1Lost = dog1?.category === "Lost";
-    const isDog2Lost = dog2?.category === "Lost";
-    const isExactMatch = match.similarityPercentage === 100;
-    const isHighSimilarity = match.similarityPercentage >= 80;
-
-    console.log("Attempting to open modal for match:", {
-      match,
-      currentUserId,
-      dog1: {
-        petId: dog1?.petId,
-        userId: dog1?.userId?._id,
-        category: dog1?.category,
-      },
-      dog2: {
-        petId: dog2?.petId,
-        userId: dog2?.userId?._id,
-        category: dog2?.category,
-      },
-      isExactMatch,
-      isHighSimilarity,
-    });
-
-    if (
-      isHighSimilarity &&
-      ((isDog1CurrentUser &&
-        isDog1Lost &&
-        dog2?.userId?._id !== currentUserId) ||
-        (isDog2CurrentUser &&
-          isDog2Lost &&
-          dog1?.userId?._id !== currentUserId))
-    ) {
-      setSelectedNewMatch({ ...match, dog1, dog2 });
-      setIsNewMatchModalOpen(true);
-      console.log("Opening modal for match:", { ...match, dog1, dog2 });
-    } else {
-      console.log("Modal not opened: Conditions not met", {
-        currentUserId,
-        dog1UserId: dog1?.userId?._id,
-        dog1Category: dog1?.category,
-        dog2UserId: dog2?.userId?._id,
-        dog2Category: dog2?.category,
-        isExactMatch,
-        isHighSimilarity,
-      });
-    }
-  };
-
-  const closeNewMatchModal = () => {
-    setIsNewMatchModalOpen(false);
-    setSelectedNewMatch(null);
-    if (selectedNewMatch) {
-      setTimeout(() => {
-        setSelectedNewMatch(selectedNewMatch);
-        setIsNewMatchModalOpen(true);
-      }, 4000);
-    }
-  };
-
-  const handleReunite = () => {
-    setIsConfirmationModalOpen(true);
-  };
-
-  const confirmReunion = async (confirmed) => {
-    setIsConfirmationModalOpen(false);
-
-    if (confirmed) {
-      try {
-        const token = await AsyncStorage.getItem("token");
-        if (!token || !selectedNewMatch) return;
-
-        const [response1, response2] = await Promise.all([
-          axios.put(
-            `http://localhost:5000/api/lostfound/mark-reunited/${selectedNewMatch.petId1}`,
-            {},
+          const lostResponse = await axios.get(
+            "http://localhost:5000/api/lostdog",
             { headers: { Authorization: `Bearer ${token}` } }
-          ),
-          axios.put(
-            `http://localhost:5000/api/lostfound/mark-reunited/${selectedNewMatch.petId2}`,
-            {},
+          );
+          const foundResponse = await axios.get(
+            "http://localhost:5000/api/founddog",
             { headers: { Authorization: `Bearer ${token}` } }
-          ),
-        ]);
+          );
+          const postsResponse = await axios.get(
+            "http://localhost:5000/api/posts/new-posts-count"
+          );
 
-        if (response1.status === 200 && response2.status === 200) {
+          const allDogs = [
+            ...(lostResponse.status === 200 ? lostResponse.data.lostDogs : []),
+            ...(foundResponse.status === 200 ? foundResponse.data.foundDogs : []),
+          ]
+            .filter((dog) => !dog.reunited)
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+          console.log(
+            "All dogs with image paths:",
+            allDogs.map((dog) => ({
+              petId: dog.petId,
+              imagePath: dog.imagePath,
+              userId: dog.userId?._id,
+              category: dog.category,
+            }))
+          );
+
+          setDogs(allDogs);
+          if (postsResponse.status === 200) {
+            setNewPostsCount(postsResponse.data.newPostsCount);
+          }
+          await processImages(allDogs);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      };
+
+      fetchData();
+
+      const socket = io("http://localhost:5000", { transports: ["websocket"] });
+
+      socket.on("connect", () =>
+        console.log("Connected to Socket.IO server:", socket.id)
+      );
+
+      socket.on("newLostDog", (newDog) => {
+        if (!newDog.reunited) {
           setDogs((prevDogs) => {
-            const updatedDogs = prevDogs.filter(
-              (dog) =>
-                dog.petId !== selectedNewMatch.petId1 &&
-                dog.petId !== selectedNewMatch.petId2
+            const updatedDogs = [newDog, ...prevDogs].sort(
+              (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
             );
             processImages(updatedDogs);
             return updatedDogs;
           });
-          setMatches((prevMatches) =>
-            prevMatches.filter(
-              (match) =>
-                match.petId1 !== selectedNewMatch.petId1 &&
-                match.petId2 !== selectedNewMatch.petId2
-            )
-          );
-          setTimeout(() => closeNewMatchModal(), 3000);
-          setSuccessMessage("Dogs reunited successfully! Wait for seconds...");
-          setTimeout(() => {
-            setSuccessMessage(null);
-            onNavigateToSuggestionsForm?.();
-          }, 8000);
         }
-      } catch (error) {
-        console.error("Error marking as reunited:", error);
-        alert("Failed to reunite dogs.");
-      }
-    } else {
-      setIsNewMatchModalOpen(true);
-    }
-  };
+      });
 
-  const handleEditClick = (dog) => {
-    setEditMode(dog.petId);
-    setEditedDog({ ...dog, image: null });
-  };
+      socket.on("newFoundDog", (newDog) => {
+        if (!newDog.reunited) {
+          setDogs((prevDogs) => {
+            const updatedDogs = [newDog, ...prevDogs].sort(
+              (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+            );
+            processImages(updatedDogs);
+            return updatedDogs;
+          });
+        }
+      });
 
-  const handleInputChange = (field, value) => {
-    setEditedDog((prev) => ({ ...prev, [field]: value }));
-  };
+      socket.on("dogReunited", ({ petId }) => {
+        setDogs((prevDogs) => {
+          const updatedDogs = prevDogs.filter((dog) => dog.petId !== petId);
+          processImages(updatedDogs);
+          return updatedDogs;
+        });
+        setMatches((prevMatches) =>
+          prevMatches.filter(
+            (match) => match.petId1 !== petId && match.petId2 !== petId
+          )
+        );
+      });
 
-  const handleImageUpload = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      alert("Sorry, we need camera roll permissions to make this work!");
-      return;
-    }
+      socket.on("updatedLostDog", (updatedDog) => {
+        setDogs((prevDogs) => {
+          const updatedDogs = prevDogs.map((dog) =>
+            dog.petId === updatedDog.petId ? updatedDog : dog
+          );
+          processImages(updatedDogs);
+          return updatedDogs;
+        });
+      });
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
-      quality: 1,
+      socket.on("updatedFoundDog", (updatedDog) => {
+        setDogs((prevDogs) => {
+          const updatedDogs = prevDogs.map((dog) =>
+            dog.petId === updatedDog.petId ? updatedDog : dog
+          );
+          processImages(updatedDogs);
+          return updatedDogs;
+        });
+      });
+
+      socket.on("disconnect", () =>
+        console.log("Disconnected from Socket.IO server")
+      );
+
+      return () => socket.disconnect();
+    }, []);
+
+    const filteredDogs = dogs.filter((dog) => {
+      const query = searchQuery.toLowerCase();
+      const location = dog.location ? String(dog.location).toLowerCase() : "";
+      const breed = dog.breed ? String(dog.breed).toLowerCase() : "";
+      const gender = dog.gender ? String(dog.gender).toLowerCase() : "";
+      const name = dog.name ? String(dog.name).toLowerCase() : "";
+
+      return (
+        location.includes(query) ||
+        breed.includes(query) ||
+        gender.includes(query) ||
+        name.includes(query)
+      );
     });
 
-    if (!result.canceled) {
-      setEditedDog((prev) => ({ ...prev, image: result.assets[0] }));
-    }
-  };
+    const createImageElement = (src) => {
+      return new Promise((resolve, reject) => {
+        if (Platform.OS === "web") {
+          const img = document.createElement("img");
+          img.src = src;
+          img.crossOrigin = "Anonymous"; // Handle CORS
+          img.onload = () => resolve(img);
+          img.onerror = () =>
+            reject(new Error(`Failed to load image from ${src}`));
+        } else {
+          // For native, we can't use DOM Image; skip TensorFlow processing
+          reject(new Error("Image processing not supported on native platform"));
+        }
+      });
+    };
 
-  // ---------------------------------------- Save Button ----------------------------------------
-  const handleSaveChanges = async (dog) => {
-    setIsLoading(true);
-    try {
-      const token = await AsyncStorage.getItem("token");
-      if (!token) return;
+    const processImages = async (dogList) => {
+      try {
+        const model = await mobilenet.load();
+        const dogsWithImages = dogList.filter((dog) => dog.imagePath);
+        const dogMatches = [];
 
-      const url =
-        dog.category === "Found"
-          ? `http://localhost:5000/api/lostfound/founddog/${dog.petId}`
-          : `http://localhost:5000/api/lostfound/lostdog/${dog.petId}`;
+        console.log("Processing dogs:", dogsWithImages.length, "dogs found");
+        console.log(
+          "Dogs to process:",
+          dogsWithImages.map((d) => ({
+            petId: d.petId,
+            userId: d.userId?._id,
+            category: d.category,
+            imagePath: d.imagePath,
+          }))
+        );
 
-      const formData = new FormData();
-      formData.append("name", editedDog.name || dog.name || "");
-      formData.append("breed", editedDog.breed || dog.breed || "");
-      formData.append("gender", editedDog.gender || dog.gender || "");
-      formData.append("location", editedDog.location || dog.location || "");
+        const imageData = await Promise.all(
+          dogsWithImages.map(async (dog) => {
+            const imageUrl = `http://localhost:5000${dog.imagePath}`;
+            console.log(`Fetching image for ${dog.petId}: ${imageUrl}`);
+            try {
+              const response = await fetch(imageUrl);
+              if (!response.ok)
+                throw new Error(`HTTP error! Status: ${response.status}`);
+              const blob = await response.blob();
+              const arrayBuffer = await blob.arrayBuffer();
+              const hash = md5(arrayBuffer);
 
-      if (editedDog.image) {
-        const imageBlob = await (await fetch(editedDog.image.uri)).blob();
-        formData.append("dogImage", imageBlob, "dogImage.jpg");
+              if (Platform.OS === "web") {
+                const img = await createImageElement(imageUrl);
+                const tensor = tf.browser
+                  .fromPixels(img)
+                  .resizeNearestNeighbor([224, 224])
+                  .toFloat()
+                  .expandDims();
+                const embedding = await model.infer(tensor, true);
+                tf.dispose(tensor);
+                console.log(`Hash for ${dog.petId}: ${hash}`);
+                return { hash, dog, embedding };
+              } else {
+                // For native, skip embedding and only use hash
+                console.log(
+                  `Hash for ${dog.petId}: ${hash} (Embedding skipped on native)`
+                );
+                return { hash, dog, embedding: null };
+              }
+            } catch (error) {
+              console.error(`Failed to fetch image for ${dog.petId}:`, error);
+              return null;
+            }
+          })
+        ).then((results) => results.filter((r) => r !== null));
+
+        for (let i = 0; i < imageData.length; i++) {
+          for (let j = i + 1; j < imageData.length; j++) {
+            const dog1 = imageData[i].dog;
+            const dog2 = imageData[j].dog;
+            const isSameUser = dog1.userId?._id === dog2.userId?._id;
+            const isDifferentCategory = dog1.category !== dog2.category;
+            const isLostDog =
+              dog1.category === "Lost" || dog2.category === "Lost";
+            const isFoundDog =
+              dog1.category === "Found" || dog2.category === "Found";
+
+            if (
+              imageData[i].hash === imageData[j].hash &&
+              !isSameUser &&
+              isDifferentCategory &&
+              isLostDog &&
+              isFoundDog
+            ) {
+              const colorSimilarity = compareColors(dog1, dog2);
+              dogMatches.push({
+                petId1: dog1.petId,
+                petId2: dog2.petId,
+                similarityPercentage: 100,
+                colorSimilarity: parseFloat(colorSimilarity),
+                isSelfMatch: false,
+              });
+              console.log(
+                `Exact match found: ${dog1.petId} vs ${dog2.petId} with color similarity ${colorSimilarity}%`
+              );
+            } else if (
+              Platform.OS === "web" &&
+              !isSameUser &&
+              isDifferentCategory &&
+              isLostDog &&
+              isFoundDog &&
+              imageData[i].embedding &&
+              imageData[j].embedding
+            ) {
+              const similarity = compareEmbeddings(
+                imageData[i].embedding,
+                imageData[j].embedding
+              );
+              const similarityPercentage = (similarity * 100).toFixed(2);
+              if (similarityPercentage >= 80) {
+                const colorSimilarity = compareColors(dog1, dog2);
+                dogMatches.push({
+                  petId1: dog1.petId,
+                  petId2: dog2.petId,
+                  similarityPercentage: parseFloat(similarityPercentage),
+                  colorSimilarity: parseFloat(colorSimilarity),
+                  isSelfMatch: false,
+                });
+                console.log(
+                  `Non-exact match found: ${dog1.petId} vs ${dog2.petId} with similarity ${similarityPercentage}% and color similarity ${colorSimilarity}%`
+                );
+              }
+            }
+          }
+        }
+
+        imageData.forEach((data) => {
+          if (data.embedding) tf.dispose(data.embedding);
+        });
+
+        setMatches(dogMatches);
+        console.log("Matches found:", dogMatches);
+      } catch (error) {
+        console.error("Error processing images:", error);
+      }
+    };
+
+    const compareEmbeddings = (embedding1, embedding2) => {
+      const similarity = tf.losses
+        .cosineDistance(embedding1, embedding2, 0)
+        .dataSync();
+      return 1 - similarity;
+    };
+
+    const compareColors = (dog1, dog2) => {
+      const randomColorSimilarity = Math.random() * 20 + 80;
+      return randomColorSimilarity.toFixed(2);
+    };
+
+    const toggleMenu = () => setMenuOpen(!menuOpen);
+
+    const handleHomeClick = () => {
+      onNavigateToHome?.();
+      setMenuOpen(false);
+    };
+
+    const handleProfileClick = () => {
+      onNavigateToProfile?.();
+      setMenuOpen(false);
+    };
+
+    const handleLogoutClick = async () => {
+      try {
+        await AsyncStorage.removeItem("token");
+        onLogout?.();
+      } catch (error) {
+        console.error("Error during logout:", error);
+      }
+      setMenuOpen(false);
+    };
+
+    const handleTabClick = (tab) => {
+      if (tab === "HomePageLostDog") onNavigateToLostDogPage?.();
+      else if (tab === "HomePageFoundDog") onNavigateToFoundDogPage?.();
+      else if (tab === "HomePageSuggestions") onNavigateToSuggestionsForm?.();
+      else if (tab === "ViewLostAndFoundSuggestions")
+        onNavigateToViewLostAndFoundSuggestions?.();
+    };
+
+    const handleMessageClick = () => onNavigateToChatForum?.();
+
+    const handleNotificationClick = () => setIsModalOpen(true);
+
+    const closeModal = () => setIsModalOpen(false);
+
+    const handleMoreInfoClick = (dog) => {
+      if (dog.category === "Found") {
+        onNavigateToLostAndFoundViewMatchedUserS?.(dog);
+      }
+      if (dog.category === "Lost") {
+        onNavigateToLostAndFoundViewMatchedUser?.(dog);
+      }
+    };
+
+    const getMatchMessage = (dog) => {
+      console.log(
+        `Checking matches for dog ${dog.petId}, currentUserId: ${currentUserId}`
+      );
+      if (dog.userId?._id !== currentUserId) return null;
+
+      const dogMatches = matches.filter(
+        (match) => match.petId1 === dog.petId || match.petId2 === dog.petId
+      );
+      console.log(`Dog ${dog.petId} matches:`, dogMatches);
+      if (dogMatches.length === 0) return null;
+
+      const matchedPetIds = dogMatches.map((match) =>
+        match.petId1 === dog.petId ? match.petId2 : match.petId1
+      );
+
+      if (matchedPetIds.length <= 2) {
+        return `Pet ID #${dog.petId} is matched with Pet ID #${matchedPetIds.join(
+          " and #"
+        )}`;
+      } else {
+        const shortList = matchedPetIds.slice(0, 2);
+        return {
+          shortMessage: `Pet ID #${dog.petId
+            } is matched with Pet ID #${shortList.join(" and #")} and more...`,
+          fullList: matchedPetIds,
+        };
+      }
+    };
+
+    const openMatchModal = (matchIds) => {
+      const matchedDogs = matchIds
+        .map((id) => dogs.find((dog) => dog.petId === id))
+        .filter(Boolean);
+      setSelectedMatches(matchedDogs);
+      setIsMatchModalOpen(true);
+    };
+
+    const closeMatchModal = () => {
+      setIsMatchModalOpen(false);
+      setSelectedMatches([]);
+    };
+
+    const openNewMatchModal = (match) => {
+      const dog1 = dogs.find((d) => d.petId === match.petId1);
+      const dog2 = dogs.find((d) => d.petId === match.petId2);
+
+      const isDog1CurrentUser = dog1?.userId?._id === currentUserId;
+      const isDog2CurrentUser = dog2?.userId?._id === currentUserId;
+      const isDog1Lost = dog1?.category === "Lost";
+      const isDog2Lost = dog2?.category === "Lost";
+      const isExactMatch = match.similarityPercentage === 100;
+      const isHighSimilarity = match.similarityPercentage >= 80;
+
+      console.log("Attempting to open modal for match:", {
+        match,
+        currentUserId,
+        dog1: {
+          petId: dog1?.petId,
+          userId: dog1?.userId?._id,
+          category: dog1?.category,
+        },
+        dog2: {
+          petId: dog2?.petId,
+          userId: dog2?.userId?._id,
+          category: dog2?.category,
+        },
+        isExactMatch,
+        isHighSimilarity,
+      });
+
+      if (
+        isHighSimilarity &&
+        ((isDog1CurrentUser &&
+          isDog1Lost &&
+          dog2?.userId?._id !== currentUserId) ||
+          (isDog2CurrentUser &&
+            isDog2Lost &&
+            dog1?.userId?._id !== currentUserId))
+      ) {
+        setSelectedNewMatch({ ...match, dog1, dog2 });
+        setIsNewMatchModalOpen(true);
+        console.log("Opening modal for match:", { ...match, dog1, dog2 });
+      } else {
+        console.log("Modal not opened: Conditions not met", {
+          currentUserId,
+          dog1UserId: dog1?.userId?._id,
+          dog1Category: dog1?.category,
+          dog2UserId: dog2?.userId?._id,
+          dog2Category: dog2?.category,
+          isExactMatch,
+          isHighSimilarity,
+        });
+      }
+    };
+
+    const closeNewMatchModal = () => {
+      setIsNewMatchModalOpen(false);
+      setSelectedNewMatch(null);
+      if (selectedNewMatch) {
+        setTimeout(() => {
+          setSelectedNewMatch(selectedNewMatch);
+          setIsNewMatchModalOpen(true);
+        }, 4000);
+      }
+    };
+
+    const handleReunite = () => {
+      setIsConfirmationModalOpen(true);
+    };
+
+    const confirmReunion = async (confirmed) => {
+      setIsConfirmationModalOpen(false);
+
+      if (confirmed) {
+        try {
+          const token = await AsyncStorage.getItem("token");
+          if (!token || !selectedNewMatch) return;
+
+          const [response1, response2] = await Promise.all([
+            axios.put(
+              `http://localhost:5000/api/lostfound/mark-reunited/${selectedNewMatch.petId1}`,
+              {},
+              { headers: { Authorization: `Bearer ${token}` } }
+            ),
+            axios.put(
+              `http://localhost:5000/api/lostfound/mark-reunited/${selectedNewMatch.petId2}`,
+              {},
+              { headers: { Authorization: `Bearer ${token}` } }
+            ),
+          ]);
+
+          if (response1.status === 200 && response2.status === 200) {
+            setDogs((prevDogs) => {
+              const updatedDogs = prevDogs.filter(
+                (dog) =>
+                  dog.petId !== selectedNewMatch.petId1 &&
+                  dog.petId !== selectedNewMatch.petId2
+              );
+              processImages(updatedDogs);
+              return updatedDogs;
+            });
+            setMatches((prevMatches) =>
+              prevMatches.filter(
+                (match) =>
+                  match.petId1 !== selectedNewMatch.petId1 &&
+                  match.petId2 !== selectedNewMatch.petId2
+              )
+            );
+            setTimeout(() => closeNewMatchModal(), 3000);
+            setSuccessMessage("Dogs reunited successfully! Wait for seconds...");
+            setTimeout(() => {
+              setSuccessMessage(null);
+              onNavigateToSuggestionsForm?.();
+            }, 8000);
+          }
+        } catch (error) {
+          console.error("Error marking as reunited:", error);
+          alert("Failed to reunite dogs.");
+        }
+      } else {
+        setIsNewMatchModalOpen(true);
+      }
+    };
+
+    const handleEditClick = (dog) => {
+      setEditMode(dog.petId);
+      setEditedDog({ ...dog, image: null });
+    };
+
+    const handleInputChange = (field, value) => {
+      setEditedDog((prev) => ({ ...prev, [field]: value }));
+    };
+
+    const handleImageUpload = async () => {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        alert("Sorry, we need camera roll permissions to make this work!");
+        return;
       }
 
-      const response = await axios.put(url, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: false,
+        quality: 1,
       });
 
-      setDogs((prevDogs) => {
-        const updatedDogs = prevDogs.map((d) =>
-          d.petId === dog.petId ? response.data : d
-        );
-        processImages(updatedDogs);
-        return updatedDogs;
-      });
+      if (!result.canceled) {
+        setEditedDog((prev) => ({ ...prev, image: result.assets[0] }));
+      }
+    };
+
+    // ---------------------------------------- Save Button ----------------------------------------
+    const handleSaveChanges = async (dog) => {
+      setIsLoading(true);
+      try {
+        const token = await AsyncStorage.getItem("token");
+        if (!token) return;
+
+        const url =
+          dog.category === "Found"
+            ? `http://localhost:5000/api/lostfound/founddog/${dog.petId}`
+            : `http://localhost:5000/api/lostfound/lostdog/${dog.petId}`;
+
+        const formData = new FormData();
+        formData.append("name", editedDog.name || dog.name || "");
+        formData.append("breed", editedDog.breed || dog.breed || "");
+        formData.append("gender", editedDog.gender || dog.gender || "");
+        formData.append("location", editedDog.location || dog.location || "");
+
+        if (editedDog.image) {
+          const imageBlob = await (await fetch(editedDog.image.uri)).blob();
+          formData.append("dogImage", imageBlob, "dogImage.jpg");
+        }
+
+        const response = await axios.put(url, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        setDogs((prevDogs) => {
+          const updatedDogs = prevDogs.map((d) =>
+            d.petId === dog.petId ? response.data : d
+          );
+          processImages(updatedDogs);
+          return updatedDogs;
+        });
+        setEditMode(null);
+        setEditedDog(null);
+        setSuccessMessage("Changes saved successfully!");
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } catch (error) {
+        console.error("Error saving changes:", error);
+        alert("Failed to save changes.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const handleCancelEdit = () => {
       setEditMode(null);
       setEditedDog(null);
-      setSuccessMessage("Changes saved successfully!");
-      setTimeout(() => setSuccessMessage(null), 3000);
-    } catch (error) {
-      console.error("Error saving changes:", error);
-      alert("Failed to save changes.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
 
-  const handleCancelEdit = () => {
-    setEditMode(null);
-    setEditedDog(null);
-  };
-
-  useEffect(() => {
-    console.log("Matches updated:", matches, "Current User ID:", currentUserId);
-    if (matches.length > 0 && currentUserId) {
-      const userMatches = matches.filter((match) => {
-        const dog1 = dogs.find((d) => d.petId === match.petId1);
-        const dog2 = dogs.find((d) => d.petId === match.petId2);
-        const isUserMatch =
-          dog1?.userId?._id === currentUserId ||
-          dog2?.userId?._id === currentUserId;
-        console.log(`Filtering match ${match.petId1} vs ${match.petId2}:`, {
-          isUserMatch,
-          dog1: { userId: dog1?.userId?._id, category: dog1?.category },
-          dog2: { userId: dog2?.userId?._id, category: dog2?.category },
+    useEffect(() => {
+      console.log("Matches updated:", matches, "Current User ID:", currentUserId);
+      if (matches.length > 0 && currentUserId) {
+        const userMatches = matches.filter((match) => {
+          const dog1 = dogs.find((d) => d.petId === match.petId1);
+          const dog2 = dogs.find((d) => d.petId === match.petId2);
+          const isUserMatch =
+            dog1?.userId?._id === currentUserId ||
+            dog2?.userId?._id === currentUserId;
+          console.log(`Filtering match ${match.petId1} vs ${match.petId2}:`, {
+            isUserMatch,
+            dog1: { userId: dog1?.userId?._id, category: dog1?.category },
+            dog2: { userId: dog2?.userId?._id, category: dog2?.category },
+          });
+          return isUserMatch;
         });
-        return isUserMatch;
-      });
 
-      console.log("User matches found:", userMatches);
+        console.log("User matches found:", userMatches);
 
-      if (userMatches.length > 0 && !isNewMatchModalOpen) {
-        const latestMatch = userMatches[0];
-        openNewMatchModal(latestMatch);
-      } else {
-        console.log("No user matches or modal already open");
+        if (userMatches.length > 0 && !isNewMatchModalOpen) {
+          const latestMatch = userMatches[0];
+          openNewMatchModal(latestMatch);
+        } else {
+          console.log("No user matches or modal already open");
+        }
       }
-    }
-  }, [matches, currentUserId]);
+    }, [matches, currentUserId]);
 
-  const toCapitalize = (str) => {
-    // ----------------------------- To capitalized first letter of the word ----------------------------------//
-    if (!str || typeof str !== "string") return "";
-    return str.replace(/\b\w/, (char) => char.toUpperCase());
-  };
+    const toCapitalize = (str) => {
+      // ----------------------------- To capitalized first letter of the word ----------------------------------//
+      if (!str || typeof str !== "string") return "";
+      return str.replace(/\b\w/, (char) => char.toUpperCase());
+    };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>PETPALS</Text>
-        <TouchableOpacity onPress={toggleMenu} style={styles.hamburgerButton}>
-          <View style={styles.hamburger}>
-            <View style={styles.hamburgerLine} />
-            <View style={styles.hamburgerLine} />
-            <View style={styles.hamburgerLine} />
-          </View>
-        </TouchableOpacity>
-      </View>
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>PETPALS</Text>
+          <TouchableOpacity onPress={toggleMenu} style={styles.hamburgerButton}>
+            <View style={styles.hamburger}>
+              <View style={styles.hamburgerLine} />
+              <View style={styles.hamburgerLine} />
+              <View style={styles.hamburgerLine} />
+            </View>
+          </TouchableOpacity>
+        </View>
 
-      <Modal
-        visible={menuOpen}
-        transparent
-        animationType="slide"
-        onRequestClose={toggleMenu}
-      >
-        <TouchableOpacity style={styles.modalOverlay} onPress={toggleMenu}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity style={styles.menuItem} onPress={handleHomeClick}>
-              <Text style={styles.menuText}>Home</Text>
+        <Modal
+          visible={menuOpen}
+          transparent
+          animationType="slide"
+          onRequestClose={toggleMenu}
+        >
+          <TouchableOpacity style={styles.modalOverlay} onPress={toggleMenu}>
+            <View style={styles.modalContent}>
+              <TouchableOpacity style={styles.menuItem} onPress={handleHomeClick}>
+                <Text style={styles.menuText}>Home</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={handleProfileClick}
+              >
+                <Text style={styles.menuText}>Profile</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={handleLogoutClick}
+              >
+                <Text style={styles.menuText}>Logout</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+
+        {/* ------------------------------------------------- NAVBAR ----------------------------------------------- */}
+        <View style={styles.navBar}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => handleTabClick("HomePageLostDog")}
+            >
+              <Text style={styles.navText}>Lost Dog</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.menuItem}
-              onPress={handleProfileClick}
+              style={styles.navButton}
+              onPress={() => handleTabClick("HomePageFoundDog")}
             >
-              <Text style={styles.menuText}>Profile</Text>
+              <Text style={styles.navText}>Found Dog</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.menuItem}
-              onPress={handleLogoutClick}
+              style={styles.navButton}
+              onPress={() => handleTabClick("HomePageMatched")}
             >
-              <Text style={styles.menuText}>Logout</Text>
+              <Text style={styles.navTexts}>Match Page</Text>
             </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </Modal>
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => handleTabClick("ViewLostAndFoundSuggestions")}
+            >
+              <Text style={styles.navText}>View Suggestions</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+        {/* ------------------------------------------------- NAVBAR END ----------------------------------------------- */}
 
-      {/* ------------------------------------------------- NAVBAR ----------------------------------------------- */}
-      <View style={styles.navBar}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => handleTabClick("HomePageLostDog")}
-          >
-            <Text style={styles.navText}>Lost Dog</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => handleTabClick("HomePageFoundDog")}
-          >
-            <Text style={styles.navText}>Found Dog</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => handleTabClick("HomePageMatched")}
-          >
-            <Text style={styles.navTexts}>Match Page</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => handleTabClick("ViewLostAndFoundSuggestions")}
-          >
-            <Text style={styles.navText}>View Suggestions</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </View>
-      {/* ------------------------------------------------- NAVBAR END ----------------------------------------------- */}
-
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search by Name, Location, Breed, or Gender..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholderTextColor="#666"
-        />
-      </View>
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search by Name, Location, Breed, or Gender..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholderTextColor="#666"
+          />
+        </View>
 
       <ScrollView contentContainerStyle={styles.content}>
         {filteredDogs.length > 0 ? (
@@ -1622,7 +1622,6 @@ const styles = StyleSheet.create({
   },
   successMessageText: {
     color: "#fff",
-
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",

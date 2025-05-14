@@ -8,7 +8,7 @@ import LoginForm from "../../components/LoginForm";
 import RegisterForm from "../../components/RegisterForm";
 import TermsModal from "../../components/TermsCondition";
 import ChooseDestination from "../../components/ChooseDestination";
-import ProfileUser from "../../components/ProfileUser";
+import UserProfile from "../../components/UserProfile";
 import LostDogForm from "../../components/LostDogForm";
 import ViewLostDogFormAfter from "../../components/ViewLostDogFormAfter";
 import LostDogPage from "../../components/LostDogPage";
@@ -51,7 +51,7 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentScreen, setCurrentScreen] = useState<
     | "ChooseDestination"
-    | "ProfileUser"
+    | "UserProfile"
     | "LostDogForm"
     | "ViewLostDogFormAfter"
     | "LostDogPage"
@@ -110,7 +110,7 @@ const App = () => {
   };
 
   const navigateToProfile = () => {
-    setCurrentScreen("ProfileUser");
+    setCurrentScreen("UserProfile");
   };
 
   const navigateToHome = () => {
@@ -240,9 +240,9 @@ const App = () => {
             onNavigateToChatForum={navigateToChatForum}
             onNavigateToViewLostAndFoundSuggestions={navigateToViewLostAndFoundSuggestions}
           />
-        ) : currentScreen === "ProfileUser" ? (
+        ) : currentScreen === "UserProfile" ? (
           <ProtectedRoute
-            component={ProfileUser}
+            component={UserProfile}
             onSignUpClick={handleSignUpClick}
             onLoginSuccess={handleLoginSuccess}
             onNavigateToHome={navigateToHome}
